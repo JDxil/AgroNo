@@ -83,11 +83,11 @@
       background: linear-gradient(135deg, #3a9a47 0%, #1e6629 100%);
       border: 1px solid var(--line-bright);
       display: grid; place-items: center; color: #fff;
-      box-shadow: 0 0 20px rgba(92, 191, 104, 0.4);
+      box-shadow: 0 0 25px rgba(92, 191, 104, 0.6);
     }
     .brand-mark svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .brand-name { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #fff; letter-spacing: -0.02em; text-shadow: 0 0 10px rgba(92,191,104,0.3); }
-    .brand-name b { color: var(--leaf-glow); }
+    .brand-name { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #fff; letter-spacing: -0.02em; text-shadow: 0 0 12px rgba(92,191,104,0.6); }
+    .brand-name b { color: var(--leaf-glow); text-shadow: 0 0 12px rgba(92,191,104,0.8); }
     
     .nav { display: flex; flex-direction: column; gap: 6px; }
     .nav-btn {
@@ -101,7 +101,7 @@
       color: var(--leaf-glow);
       border-color: var(--leaf-glow);
       font-weight: 600;
-      box-shadow: 0 0 15px rgba(92, 191, 104, 0.25);
+      box-shadow: 0 0 18px rgba(92, 191, 104, 0.4);
     }
     .nav-btn svg { flex: none; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -115,7 +115,7 @@
       display: inline-block; padding: 2px 8px; border-radius: 99px;
       font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
       color: var(--leaf-glow); background: var(--leaf-soft); border: 1px solid var(--leaf-glow);
-      font-weight: 700; width: fit-content;
+      font-weight: 700; width: fit-content; text-shadow: 0 0 8px rgba(92,191,104,0.5);
     }
     .btn-logout {
       background: transparent; border: 1px solid var(--line); color: var(--muted);
@@ -133,7 +133,7 @@
 
     .head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
     .head-title { min-width: 0; }
-    .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--leaf-glow); text-shadow: 0 0 8px rgba(92,191,104,0.3); }
+    .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--leaf-glow); text-shadow: 0 0 10px rgba(92,191,104,0.5); }
     h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 4vw, 36px); line-height: 1.1; letter-spacing: -.02em; margin-top: 4px; color: #fff; }
     .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 10px; color: var(--muted); font-size: 14px; }
     
@@ -144,8 +144,8 @@
 
     .lote-selector { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 6px 14px; }
     .lote-selector label { font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; }
-    .lote-selector select { background: transparent; border: 0; color: var(--leaf-glow); font-weight: 700; font-size: 15px; cursor: pointer; outline: none; }
-    .lote-selector select option { background: #0c1b11; color: var(--ink); }
+    .lote-selector select { background: transparent; border: 0; color: var(--leaf-glow); font-weight: 700; font-size: 15px; cursor: pointer; outline: none; text-shadow: 0 0 8px rgba(92,191,104,0.4); }
+    .lote-selector select option { background: #030804; color: var(--ink); }
 
     .actions { display: flex; flex-wrap: wrap; gap: 10px; }
     .btn {
@@ -153,15 +153,15 @@
       border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
       font-weight: 600; cursor: pointer; transition: all .2s;
     }
-    .btn:hover { background: rgba(22, 45, 29, 0.95); border-color: var(--leaf-glow); box-shadow: 0 0 12px rgba(92,191,104,0.3); }
+    .btn:hover { background: rgba(22, 45, 29, 0.95); border-color: var(--leaf-glow); box-shadow: 0 0 15px rgba(92,191,104,0.4); }
     .btn:active { transform: translateY(1px); }
     .btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .btn.primary {
       background: linear-gradient(135deg, #3a9a47 0%, #1e6629 100%);
       border: 1px solid rgba(143, 219, 152, 0.4); color: #fff;
-      box-shadow: 0 4px 20px rgba(58, 154, 71, 0.3);
+      box-shadow: 0 4px 20px rgba(58, 154, 71, 0.4);
     }
-    .btn.primary:hover { box-shadow: 0 6px 24px rgba(92, 191, 104, 0.5); }
+    .btn.primary:hover { box-shadow: 0 6px 24px rgba(92, 191, 104, 0.6); }
     .btn.quiet { background: transparent; }
 
     /* ---------- Tarjetas de Información ---------- */
@@ -170,10 +170,10 @@
     .info-box span { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
     .info-box b { font-size: 16px; color: #fff; font-family: var(--font-display); }
 
-    /* ---------- Tarjetas de Sensores ---------- */
-    .cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+    /* ---------- Tarjetas de Sensores (Exactamente 3) ---------- */
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
     .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; backdrop-filter: blur(10px); transition: border-color .2s; }
-    .card:hover { border-color: var(--line-bright); }
+    .card:hover { border-color: var(--line-bright); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 20px rgba(92, 191, 104, 0.25); }
     .card-top { display: flex; align-items: center; gap: 10px; }
     .ico { flex: none; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; }
     .ico-svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -181,17 +181,15 @@
     .val { font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 2.5vw, 36px); line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; color: #fff; }
     .unit { font-family: var(--font-body); font-size: 15px; font-weight: 600; color: var(--muted); }
     .gauge { height: 6px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
-    .gauge i { display: block; height: 100%; border-radius: 99px; background: var(--c); box-shadow: 0 0 8px var(--c); }
+    .gauge i { display: block; height: 100%; border-radius: 99px; background: var(--c); box-shadow: 0 0 10px var(--c); }
     .chip { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
-    .chip.ok { background: var(--leaf-soft); color: var(--leaf-glow); border: 1px solid var(--leaf-glow); }
+    .chip.ok { background: var(--leaf-soft); color: var(--leaf-glow); border: 1px solid var(--leaf-glow); text-shadow: 0 0 6px rgba(92,191,104,0.4); }
     .chip.warn { background: var(--yellow-soft); color: var(--yellow-ink); border: 1px solid var(--yellow); }
     .chip.alert { background: var(--orange-soft); color: var(--orange-ink); border: 1px solid var(--orange); }
     
     .card.soil { --c: var(--blue); } .card.soil .ico { background: var(--blue-soft); color: var(--blue-ink); border: 1px solid var(--blue); }
     .card.temp { --c: var(--yellow); } .card.temp .ico { background: var(--yellow-soft); color: var(--yellow-ink); border: 1px solid var(--yellow); }
-    .card.air { --c: var(--blue); } .card.air .ico { background: var(--blue-soft); color: var(--blue-ink); border: 1px solid var(--blue); }
-    .card.wind { --c: var(--leaf-glow); } .card.wind .ico { background: var(--leaf-soft); color: var(--leaf-glow); border: 1px solid var(--leaf-glow); }
-    .card.rain { --c: var(--blue); } .card.rain .ico { background: var(--blue-soft); color: var(--blue-ink); border: 1px solid var(--blue); }
+    .card.air  { --c: var(--blue); } .card.air .ico { background: var(--blue-soft); color: var(--blue-ink); border: 1px solid var(--blue); }
 
     .row { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 24px; }
 
@@ -211,54 +209,36 @@
     .g-line { stroke: var(--line); stroke-width: 1; }
     .g-axis { fill: var(--muted); font: 12px var(--font-body); font-variant-numeric: tabular-nums; }
     .g-band { fill: var(--leaf-soft); opacity: .6; }
-    .g-band-label { fill: var(--leaf-glow); font: 600 11.5px var(--font-body); }
+    .g-band-label { fill: var(--leaf-glow); font: 600 11.5px var(--font-body); text-shadow: 0 0 6px rgba(92,191,104,0.4); }
     .g-path { fill: none; stroke: var(--blue); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
     .g-dot { fill: var(--bg); stroke: var(--blue); stroke-width: 2.5; }
     .g-dot.last { fill: var(--blue); }
     .g-val { fill: #fff; font: 700 13px var(--font-body); font-variant-numeric: tabular-nums; }
     .g-hover { stroke: var(--blue); stroke-width: 1; stroke-dasharray: 3 3; }
-    .tip { position: absolute; pointer-events: none; background: #050e07; border: 1px solid var(--line-bright); color: #fff; border-radius: 10px; padding: 6px 12px; font-size: 12.5px; line-height: 1.35; white-space: nowrap; transform: translate(-50%,-100%); box-shadow: var(--shadow); }
-    .tip b { font-variant-numeric: tabular-nums; color: var(--leaf-glow); }
+    .tip { position: absolute; pointer-events: none; background: #030804; border: 1px solid var(--line-bright); color: #fff; border-radius: 10px; padding: 6px 12px; font-size: 12.5px; line-height: 1.35; white-space: nowrap; transform: translate(-50%,-100%); box-shadow: var(--shadow); }
+    .tip b { font-variant-numeric: tabular-nums; color: var(--leaf-glow); text-shadow: 0 0 8px rgba(92,191,104,0.5); }
 
     /* ---------- Mapa Leaflet ---------- */
     .map-container {
       position: relative; width: 100%; height: 320px; border-radius: 18px;
       border: 1px solid var(--line-bright); overflow: hidden;
-      box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index: 1;
+      box-shadow: 0 0 25px rgba(0,0,0,0.8), 0 0 10px rgba(92, 191, 104, 0.2); z-index: 1;
     }
-    #satelliteMap, #rainMapOnline { width: 100%; height: 100%; background: #0d1a10; }
+    #satelliteMap, #rainMapOnline { width: 100%; height: 100%; background: #030804; }
 
     .leaflet-popup-content-wrapper {
-      background: var(--surface) !important;
+      background: rgba(3, 8, 4, 0.95) !important;
       color: #fff !important;
       border: 1px solid var(--line-bright) !important;
       border-radius: 12px !important;
       box-shadow: var(--shadow) !important;
     }
-    .leaflet-popup-tip { background: var(--surface) !important; }
+    .leaflet-popup-tip { background: rgba(3, 8, 4, 0.95) !important; }
 
     /* ---------- Diagnóstico Nodos y Alertas ---------- */
-    .counts { display: flex; gap: 10px; margin-bottom: 14px; }
-    .count { flex: 1; border-radius: 14px; padding: 12px; background: var(--leaf-soft); color: var(--leaf-glow); border: 1px solid var(--leaf-glow); }
-    .count.review { background: var(--orange-soft); color: var(--orange-ink); border-color: var(--orange); }
-    .count b { display: block; font-family: var(--font-display); font-size: 26px; line-height: 1.1; }
-    .count span { font-size: 13px; font-weight: 600; }
-    .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-    .dev { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
-    .dev:first-child { border-top: 0; }
-    .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--leaf-glow); box-shadow: 0 0 10px var(--leaf-glow); }
-    .dev.review .dot { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
-    .dev-main { min-width: 0; flex: 1; }
-    .dev-name { font-weight: 600; font-size: 14.5px; color: #fff; }
-    .dev-topic { font: 12px/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--muted); overflow-wrap: anywhere; }
-    .dev-state { flex: none; text-align: right; font-size: 12.5px; color: var(--muted); }
-    .dev-state b { display: block; font-size: 13px; color: var(--leaf-glow); }
-    .dev.review .dev-state b { color: var(--orange-ink); }
-
     .alert-item { display: flex; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
     .alert-item:first-child { border-top: 0; padding-top: 0; }
     .a-ico { flex: none; width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--orange-soft); color: var(--orange-ink); border: 1px solid var(--orange); }
-    .a-ico.done { background: var(--leaf-soft); color: var(--leaf-glow); border-color: var(--leaf-glow); }
     .a-ico svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
     .a-main { min-width: 0; flex: 1; }
     .a-title { font-weight: 600; color: #fff; }
@@ -266,22 +246,19 @@
     .a-when { flex: none; font-size: 12.5px; color: var(--muted); text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 
     /* Recomendación Agronómica */
-    .reco { background: linear-gradient(145deg, rgba(14,30,18,0.95), rgba(5,14,7,0.95)); color: var(--forest-ink); border-color: var(--line-bright); }
+    .reco { background: linear-gradient(145deg, rgba(14,30,18,0.95), rgba(3,8,4,0.95)); color: var(--forest-ink); border-color: var(--line-bright); }
     .reco h2 { color: #fff; }
     .reco .sub { color: var(--muted); }
-    .reco-lead { font-family: var(--font-display); font-size: 20px; line-height: 1.3; font-weight: 600; color: var(--leaf-glow); margin-bottom: 14px; text-wrap: balance; }
+    .reco-lead { font-family: var(--font-display); font-size: 20px; line-height: 1.3; font-weight: 600; color: var(--leaf-glow); margin-bottom: 14px; text-wrap: balance; text-shadow: 0 0 10px rgba(92,191,104,0.4); }
     .reco ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 14.5px; }
     .reco li { display: flex; gap: 10px; }
-    .reco li svg { flex: none; width: 20px; height: 20px; margin-top: 2px; fill: none; stroke: var(--leaf-glow); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .reco li svg { flex: none; width: 20px; height: 20px; margin-top: 2px; fill: none; stroke: var(--leaf-glow); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px rgba(92,191,104,0.6)); }
 
     /* Configuración y Tablas */
     .cfg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
     .cfg div { background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; min-width: 0; }
     .cfg dt { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
     .cfg dd { margin: 4px 0 0; font-weight: 600; overflow-wrap: anywhere; color: #fff; }
-    details { margin-top: 16px; color: var(--muted); font-size: 14px; }
-    summary { cursor: pointer; font-weight: 600; color: var(--ink); }
-    pre { margin: 10px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); overflow-x: auto; font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--ink); }
 
     .data-table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px; }
     .data-table th, .data-table td { padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
@@ -293,42 +270,109 @@
     .field { display: flex; flex-direction: column; gap: 6px; }
     .field label { font-weight: 600; font-size: 14px; color: var(--forest-ink); }
     .field input, .field select { min-height: 46px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface-2); color: #fff; padding: 0 14px; font-size: 14.5px; }
-    .field input:focus, .field select:focus { outline: none; border-color: var(--leaf-glow); box-shadow: 0 0 15px rgba(92,191,104,0.3); }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--leaf-glow); box-shadow: 0 0 15px rgba(92,191,104,0.4); }
     .hint { font-size: 13px; color: var(--muted); }
 
     .msg-box { font-size: 13.5px; font-weight: 500; min-height: 18px; margin-top: 8px; }
-    .msg-box.ok { color: var(--leaf-glow); }
+    .msg-box.ok { color: var(--leaf-glow); text-shadow: 0 0 6px rgba(92,191,104,0.4); }
     .msg-box.err { color: var(--orange-ink); }
 
-    /* Ventanas Modales Neón Generales */
-    dialog { border: 1px solid var(--line-bright); padding: 0; border-radius: 24px; width: calc(100% - 32px); max-width: 460px; background: rgba(10, 20, 13, 0.96); color: var(--ink); box-shadow: var(--shadow); backdrop-filter: blur(12px); z-index: 1000; }
-    dialog::backdrop { background: rgba(3, 8, 4, 0.85); backdrop-filter: blur(8px); }
-    .m-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 24px 24px 10px; border-bottom: 1px solid var(--line); }
-    .m-head h2 { font-size: 22px; color: #fff; font-family: var(--font-display); }
-    .m-close { flex: none; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); cursor: pointer; display: grid; place-items: center; }
+    /* =========================================================
+       DISEÑO NEÓN EXCLUSIVO PARA VENTANAS MODALES Y LOGIN
+       Fondo Negro (#030804) + Logo / Acentos Verde Neón con Brillo
+       ========================================================= */
+    dialog { 
+      border: 1.5px solid var(--leaf-glow); 
+      padding: 0; 
+      border-radius: 24px; 
+      width: calc(100% - 32px); 
+      max-width: 460px; 
+      background: #030804 !important; 
+      color: var(--ink); 
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.95), 0 0 25px rgba(92, 191, 104, 0.35); 
+      backdrop-filter: blur(16px); 
+      z-index: 1000; 
+    }
+    dialog::backdrop { 
+      background: rgba(3, 8, 4, 0.9); 
+      backdrop-filter: blur(10px); 
+    }
+    .m-head { 
+      display: flex; 
+      align-items: flex-start; 
+      justify-content: space-between; 
+      gap: 12px; 
+      padding: 24px 24px 14px; 
+      border-bottom: 1px solid var(--line); 
+      background: rgba(5, 14, 7, 0.9);
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+    }
+    .m-head h2 { 
+      font-size: 24px; 
+      color: #fff; 
+      font-family: var(--font-display); 
+      text-shadow: 0 0 12px rgba(92, 191, 104, 0.6);
+      letter-spacing: -0.01em;
+    }
+    .m-close { 
+      flex: none; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); 
+      background: var(--surface-2); color: var(--ink); cursor: pointer; display: grid; place-items: center; 
+      transition: all .2s ease;
+    }
+    .m-close:hover {
+      border-color: var(--leaf-glow);
+      color: var(--leaf-glow);
+      box-shadow: 0 0 10px rgba(92, 191, 104, 0.4);
+    }
     .m-close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-    .m-body { padding: 18px 24px 8px; display: flex; flex-direction: column; gap: 16px; }
+    .m-body { padding: 20px 24px 10px; display: flex; flex-direction: column; gap: 16px; background: #030804; }
     .m-msg { min-height: 20px; font-size: 13.5px; font-weight: 500; margin: 0; }
     .m-msg.err { color: var(--orange-ink); }
-    .m-msg.ok { color: var(--leaf-glow); }
-    .m-foot { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; padding: 10px 24px 24px; }
+    .m-msg.ok { color: var(--leaf-glow); text-shadow: 0 0 6px rgba(92,191,104,0.4); }
+    .m-foot { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; padding: 14px 24px 24px; background: #030804; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; }
 
-    /* Modal Login */
-    dialog#loginDialog { border-color: rgba(92, 191, 104, 0.4); }
-    dialog#loginDialog .m-head h2 { text-shadow: 0 0 12px rgba(92, 191, 104, 0.4); }
+    /* Estilo Específico para el Login con Logo e Identidad Verde Neón Brillante */
+    dialog#loginDialog {
+      border-color: rgba(92, 191, 104, 0.6);
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(92, 191, 104, 0.45);
+    }
+    .login-brand-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 6px;
+    }
+    .login-logo-glow {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #3a9a47 0%, #1e6629 100%);
+      border: 1.5px solid var(--leaf-glow);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      box-shadow: 0 0 25px rgba(92, 191, 104, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+    .login-logo-glow svg {
+      width: 28px;
+      height: 28px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+    }
 
-    .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: #050e07; border: 1px solid var(--line-bright); color: #fff; padding: 12px 20px; border-radius: 14px; font-size: 14px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5000; max-width: calc(100% - 32px); box-shadow: var(--shadow); }
+    .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: #030804; border: 1px solid var(--line-bright); color: #fff; padding: 12px 20px; border-radius: 14px; font-size: 14px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5000; max-width: calc(100% - 32px); box-shadow: var(--shadow); }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-    @media (max-width: 1180px) {
-      .cards { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-      .card { grid-column: span 2; }
-      .card:nth-child(n+4) { grid-column: span 3; }
-      .lote-info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
     @media (max-width: 1000px) {
+      .cards { grid-template-columns: repeat(1, minmax(0, 1fr)); }
       .row { grid-template-columns: minmax(0, 1fr); }
       .cfg { grid-template-columns: minmax(0, 1fr); }
+      .lote-info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
       .app { grid-template-columns: minmax(0, 1fr); }
@@ -337,9 +381,7 @@
       .nav { flex-direction: row; width: 100%; gap: 2px; }
       .nav-btn { flex: 1; min-width: 0; flex-direction: column; gap: 3px; padding: 7px 2px; font-size: 11px; text-align: center; border-radius: 10px; justify-content: center; }
       .content { padding-block: 18px calc(96px + env(safe-area-inset-bottom, 0px)); }
-      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .card, .card:nth-child(n+4) { grid-column: auto; }
-      .card:first-child { grid-column: 1 / -1; }
+      .cards { grid-template-columns: 1fr; }
       .lote-info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -351,9 +393,6 @@
   <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.2 6 10.5a6 6 0 0 1-12 0C6 9.2 12 3 12 3z"/></symbol>
   <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M10 14.5V5a2 2 0 1 1 4 0v9.5a4 4 0 1 1-4 0z"/></symbol>
   <symbol id="i-waves" viewBox="0 0 24 24"><path d="M3 8c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 13c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></symbol>
-  <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8"/></symbol>
-  <symbol id="i-rain" viewBox="0 0 24 24"><path d="M7 15a4 4 0 1 1 1-7.9A5.5 5.5 0 0 1 18.5 9.5 3.2 3.2 0 0 1 18 15H7zM8 18.5l-1 2M12 18.5l-1 2M16 18.5l-1 2"/></symbol>
-  <symbol id="i-cloud-rain" viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242M16 14v6M8 14v6M12 16v6"/></symbol>
 </svg>
 
 <div class="app">
@@ -413,7 +452,7 @@
         <header class="head">
           <div class="head-title">
             <p class="eyebrow">AgroNo Telemetry System</p>
-            <h1 id="lblLoteActual">Lote La Esperanza</h1>
+            <h1 id="lblLoteActual">Lote La Esperanza (Maíz)</h1>
             <p class="meta">
               <span id="conn" class="pill">Datos de demostración</span>
               <span>Última actualización: <time id="updated">—</time></span>
@@ -423,9 +462,9 @@
           <div class="lote-selector">
             <label for="selLoteActivo">Sembradío Activo:</label>
             <select id="selLoteActivo">
-              <option value="lote1">Lote La Esperanza (Sahagún Norte)</option>
-              <option value="lote2">Lote El Porvenir (Sahagún Este)</option>
-              <option value="lote3">Lote San José (Sahagún Sur)</option>
+              <option value="lote1">Lote La Esperanza (Maíz)</option>
+              <option value="lote2">Lote El Porvenir (Yuca)</option>
+              <option value="lote3">Lote San José (Ñame)</option>
             </select>
           </div>
 
@@ -446,20 +485,20 @@
             <b id="infCoords">8.9560° N, 75.4480° W</b>
           </div>
           <div class="info-box">
-            <span>Área & Variedad</span>
-            <b id="infArea">4.5 Ha · M-Col 2215</b>
+            <span>Área & Cultivo</span>
+            <b id="infArea">4.5 Ha · Maíz Amarillo</b>
           </div>
           <div class="info-box">
             <span>Etapa de Cultivo</span>
-            <b id="infEtapa">Engrose de Raíz (Mes 5)</b>
+            <b id="infEtapa">Floración / Jiloteo (Mes 3)</b>
           </div>
           <div class="info-box">
             <span>Días desde Siembra</span>
-            <b id="infDias">142 Días</b>
+            <b id="infDias">85 Días</b>
           </div>
         </div>
 
-        <!-- Tarjetas dinámicas de Sensores -->
+        <!-- Exactamente 3 Tarjetas de Sensores Principales -->
         <div class="cards" id="cards"></div>
 
         <!-- Gráfica e Historial con Mapa Satelital Real de Sahagún -->
@@ -537,7 +576,7 @@
           <dl class="cfg" style="margin-bottom:0">
             <div><dt>Estado Broker</dt><dd id="cfgState">Datos de demostración</dd></div>
             <div><dt>Dirección WebSocket</dt><dd id="cfgUrl">Sin configurar</dd></div>
-            <div><dt>Tópico Activo</dt><dd id="cfgTopic">cultivo/yuca/+/sensores</dd></div>
+            <div><dt>Tópico Activo</dt><dd id="cfgTopic">cultivo/maiz/+/sensores</dd></div>
           </dl>
         </section>
       </section>
@@ -553,7 +592,7 @@
 
         <div class="panel">
           <div class="panel-head">
-            <h2>Lista de Nodos por Sembradío</h2>
+            <h2>Lista de Nodos por Sembradío (3 Mediciones Principales)</h2>
             <button class="btn primary">+ Vincular Nodo</button>
           </div>
           <table class="data-table">
@@ -572,7 +611,7 @@
         </div>
       </section>
 
-      <!-- ================= 3. PÁGINA MAPA DE LLUVIAS ONLINE (OPENSTREETMAP + RAINVIEWER) ================= -->
+      <!-- ================= 3. PÁGINA MAPA DE LLUVIAS ONLINE ================= -->
       <section id="page-radar-lluvias" class="page-section">
         <header class="head">
           <div>
@@ -616,9 +655,9 @@
               <div class="field">
                 <label for="loteCultivo">Tipo de Cultivo</label>
                 <select id="loteCultivo">
-                  <option value="Yuca">Yuca</option>
                   <option value="Maíz">Maíz</option>
-                  <option value="Plátano">Plátano</option>
+                  <option value="Yuca">Yuca</option>
+                  <option value="Ñame">Ñame</option>
                 </select>
               </div>
               <div class="field">
@@ -648,16 +687,23 @@
             <tbody id="tablaSembradiosBody">
               <tr>
                 <td><strong>Lote La Esperanza</strong></td>
-                <td>Yuca M-Col</td>
+                <td>Maíz</td>
                 <td>4.5 Ha</td>
                 <td>8.9560° N, 75.4480° W</td>
                 <td><button class="btn" style="min-height:30px; padding:0 10px; font-size:12px">Editar</button></td>
               </tr>
               <tr>
                 <td><strong>Lote El Porvenir</strong></td>
-                <td>Yuca Taiwanesa</td>
+                <td>Yuca</td>
                 <td>3.2 Ha</td>
                 <td>8.9612° N, 75.4120° W</td>
+                <td><button class="btn" style="min-height:30px; padding:0 10px; font-size:12px">Editar</button></td>
+              </tr>
+              <tr>
+                <td><strong>Lote San José</strong></td>
+                <td>Ñame</td>
+                <td>5.0 Ha</td>
+                <td>8.9320° N, 75.4610° W</td>
                 <td><button class="btn" style="min-height:30px; padding:0 10px; font-size:12px">Editar</button></td>
               </tr>
             </tbody>
@@ -749,7 +795,7 @@
       </div>
       <div class="field">
         <label for="mqttTopic">Tópico MQTT</label>
-        <input id="mqttTopic" name="mqttTopic" type="text" value="cultivo/yuca/+/sensores">
+        <input id="mqttTopic" name="mqttTopic" type="text" value="cultivo/maiz/+/sensores">
       </div>
       <p class="m-msg" id="mMsg" role="status" aria-live="polite"></p>
     </div>
@@ -761,12 +807,17 @@
   </form>
 </dialog>
 
-<!-- Modal Iniciar Sesión -->
+<!-- Modal Iniciar Sesión (Fondo Negro, Logo Neón Brillante) -->
 <dialog id="loginDialog">
   <form id="loginForm">
     <div class="m-head">
       <div>
-        <h2>Acceso a AgroNo</h2>
+        <div class="login-brand-header">
+          <div class="login-logo-glow">
+            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2zm0 3a7 7 0 0 0-7 7c0 3.866 3.134 7 7 7s7-3.134 7-7a7 7 0 0 0-7-7zm0 2.5a4.5 4.5 0 0 1 4.5 4.5c0 1.2-1 3.5-4.5 6.5-3.5-3-4.5-5.3-4.5-6.5a4.5 4.5 0 0 1 4.5-4.5z"/></svg>
+          </div>
+          <h2>Acceso a AgroNo</h2>
+        </div>
         <p class="sub" style="margin-top:2px">Ingresa tus credenciales registradas en la plataforma.</p>
       </div>
     </div>
@@ -808,7 +859,6 @@
     getDoc 
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // Configuración de la base de datos Firebase: agrono-bb841
   const firebaseConfig = {
     apiKey: "AIzaSyA1R1CHtT47MPZE_TnSnnDbbeoapQZfQBs",
     authDomain: "agrono-bb841.firebaseapp.com",
@@ -824,7 +874,6 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // ÚNICO USUARIO ADMINISTRADOR AUTORIZADO
   const LOCAL_USERS = {
     "ruabravojuandavid02@gmail.com": { pass: "juan2007XDX", name: "Juan David Rua Bravo", role: "admin" }
   };
@@ -837,7 +886,6 @@
   const userRole = document.getElementById('userRole');
   const btnLogout = document.getElementById('btnLogout');
 
-  // Navegación SPA
   const navButtons = document.querySelectorAll('.nav-btn');
   const pageSections = document.querySelectorAll('.page-section');
 
@@ -862,7 +910,6 @@
     loginDialog.showModal();
   });
 
-  // Estado de Autenticación de Firebase Auth
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       try {
@@ -893,7 +940,6 @@
     }
   });
 
-  // Formulario de Inicio de Sesión
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     loginError.textContent = "";
@@ -914,7 +960,6 @@
     }
   });
 
-  // Registro de Usuario en Firestore
   const formUsuario = document.getElementById('formUsuario');
   const usrMsg = document.getElementById('usrMsg');
   const tablaUsuariosBody = document.getElementById('tablaUsuariosBody');
@@ -932,7 +977,6 @@
 
       try {
         const docId = email.replace(/[@.]/g, "_");
-
         await setDoc(doc(db, "usuarios", docId), {
           nombre: nombre,
           email: email,
@@ -964,7 +1008,6 @@
     });
   }
 
-  // Registro de Sembradío en Firestore
   const formSembradio = document.getElementById('formSembradio');
   const loteMsg = document.getElementById('loteMsg');
   const tablaSembradiosBody = document.getElementById('tablaSembradiosBody');
@@ -1001,7 +1044,6 @@
     });
   }
 
-  // Cerrar Sesión
   btnLogout.addEventListener('click', () => {
     signOut(auth).catch(() => {});
     actualizarInterfaz(false);
@@ -1027,57 +1069,53 @@
   }
 </script>
 
-<!-- Script IIFE: Mapas Leaflet Satelital, OpenStreetMap + RainViewer Radar API y Telemetría -->
+<!-- Script IIFE: Mapas Leaflet + 3 Mediciones + Cultivos Maíz, Yuca, Ñame -->
 <script>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
 
-  /* ---------- Datos Multilote AgroNo ---------- */
+  /* ---------- Datos Multilote AgroNo (Maíz, Yuca, Ñame) ---------- */
   var LOTES_DATA = {
     lote1: {
-      nombre: "Lote La Esperanza",
+      nombre: "Lote La Esperanza (Maíz)",
       coords: "8.9560° N, 75.4480° W",
       lat: 8.9560, lng: -75.4480,
-      area: "4.5 Ha · M-Col 2215",
-      etapa: "Engrose de Raíz (Mes 5)",
-      dias: "142 Días",
-      sensorsCount: 4,
-      sensors: { soil: 42.5, temp: 28.1, air: 76, wind: 4.2, rain: 0.0 },
+      area: "4.5 Ha · Maíz Amarillo",
+      etapa: "Floración / Jiloteo (Mes 3)",
+      dias: "85 Días",
+      sensors: { soil: 42.5, temp: 28.1, air: 76 },
       history: [49.8, 47.6, 45.1, 42.3, 40.1, 38.4, 42.5],
       nodes: [
-        { sembradio:"Lote La Esperanza", id: "NODE-01", topic: "cultivo/yuca/suelo1", bat: "98%", rssi: "-65 dBm", state: "ok" },
-        { sembradio:"Lote La Esperanza", id: "NODE-02", topic: "cultivo/yuca/clima", bat: "92%", rssi: "-70 dBm", state: "ok" },
-        { sembradio:"Lote La Esperanza", id: "NODE-03", topic: "cultivo/yuca/viento", bat: "45%", rssi: "-82 dBm", state: "warn" }
+        { sembradio:"Lote La Esperanza", id: "NODE-01", topic: "cultivo/maiz/suelo1", bat: "98%", rssi: "-65 dBm", state: "ok" },
+        { sembradio:"Lote La Esperanza", id: "NODE-02", topic: "cultivo/maiz/clima", bat: "92%", rssi: "-70 dBm", state: "ok" }
       ]
     },
     lote2: {
-      nombre: "Lote El Porvenir",
+      nombre: "Lote El Porvenir (Yuca)",
       coords: "8.9612° N, 75.4120° W",
       lat: 8.9612, lng: -75.4120,
-      area: "3.2 Ha · Taiwanesa",
-      etapa: "Crecimiento Foliar (Mes 2)",
-      dias: "68 Días",
-      sensorsCount: 3,
-      sensors: { soil: 34.1, temp: 30.4, air: 68, wind: 6.5, rain: 2.5 },
+      area: "3.2 Ha · Yuca M-Col",
+      etapa: "Engrose de Raíz (Mes 5)",
+      dias: "142 Días",
+      sensors: { soil: 34.1, temp: 30.4, air: 68 },
       history: [31.0, 32.5, 30.2, 29.8, 33.0, 35.2, 34.1],
       nodes: [
-        { sembradio:"Lote El Porvenir", id: "NODE-04", topic: "cultivo/yuca2/suelo", bat: "100%", rssi: "-60 dBm", state: "ok" },
-        { sembradio:"Lote El Porvenir", id: "NODE-05", topic: "cultivo/yuca2/clima", bat: "88%", rssi: "-74 dBm", state: "ok" }
+        { sembradio:"Lote El Porvenir", id: "NODE-03", topic: "cultivo/yuca/suelo", bat: "100%", rssi: "-60 dBm", state: "ok" },
+        { sembradio:"Lote El Porvenir", id: "NODE-04", topic: "cultivo/yuca/clima", bat: "88%", rssi: "-74 dBm", state: "ok" }
       ]
     },
     lote3: {
-      nombre: "Lote San José",
+      nombre: "Lote San José (Ñame)",
       coords: "8.9320° N, 75.4610° W",
       lat: 8.9320, lng: -75.4610,
-      area: "5.0 Ha · Maíz Dulce",
-      etapa: "Floración / Jiloteo",
-      dias: "52 Días",
-      sensorsCount: 5,
-      sensors: { soil: 51.2, temp: 27.5, air: 82, wind: 3.1, rain: 12.0 },
+      area: "5.0 Ha · Ñame Espino",
+      etapa: "Desarrollo de Tubería (Mes 4)",
+      dias: "115 Días",
+      sensors: { soil: 51.2, temp: 27.5, air: 82 },
       history: [55.0, 54.2, 53.1, 52.0, 51.5, 50.8, 51.2],
       nodes: [
-        { sembradio:"Lote San José", id: "NODE-06", topic: "cultivo/maiz/suelo1", bat: "95%", rssi: "-62 dBm", state: "ok" },
-        { sembradio:"Lote San José", id: "NODE-07", topic: "cultivo/maiz/lluvia", bat: "91%", rssi: "-68 dBm", state: "ok" }
+        { sembradio:"Lote San José", id: "NODE-05", topic: "cultivo/ñame/suelo1", bat: "95%", rssi: "-62 dBm", state: "ok" },
+        { sembradio:"Lote San José", id: "NODE-06", topic: "cultivo/ñame/clima", bat: "91%", rssi: "-68 dBm", state: "ok" }
       ]
     }
   };
@@ -1095,19 +1133,13 @@
     {key:'temp', cls:'temp', label:'Temperatura ambiente', unit:'°C',   dec:1, min:0, max:45,  icon:'i-thermo',
       status:function(v){ return v<18?['warn','Fría']:v<=32?['ok','Adecuada']:['alert','Calor alto']; }},
     {key:'air',  cls:'air',  label:'Humedad del aire',     unit:'%',    dec:0, min:0, max:100, icon:'i-waves',
-      status:function(v){ return v<50?['warn','Aire seco']:v<=85?['ok','Normal']:['warn','Muy húmedo']; }},
-    {key:'wind', cls:'wind', label:'Velocidad del viento', unit:'km/h', dec:1, min:0, max:40,  icon:'i-wind',
-      status:function(v){ return v<20?['ok','Brisa suave']:v<30?['warn','Viento moderado']:['alert','Viento fuerte']; }},
-    {key:'rain', cls:'rain', label:'Lluvia acumulada',     unit:'mm',   dec:1, min:0, max:50,  icon:'i-rain',
-      status:function(v){ return v<=0?['ok','Sin lluvia']:v<30?['ok','Con lluvia']:['warn','Lluvia fuerte']; }}
+      status:function(v){ return v<50?['warn','Aire seco']:v<=85?['ok','Normal']:['warn','Muy húmedo']; }}
   ];
 
   var ALIAS = {
     soil:['humedad_suelo','soil','suelo','soil_moisture'],
     temp:['temperatura','temp','temperature'],
-    air:['humedad_aire','humedad','air','humidity'],
-    wind:['viento','velocidad_viento','wind'],
-    rain:['lluvia','lluvia_acumulada','rain']
+    air:['humedad_aire','humedad','air','humidity']
   };
 
   function clamp(v,a,b){ return Math.min(b, Math.max(a, v)); }
@@ -1150,7 +1182,7 @@
   }
 
   function renderReco(){
-    var soil = data.soil, rain = data.rain;
+    var soil = data.soil;
     var lead, tips = [];
     if(soil < 35){
       lead = 'La humedad del suelo está baja. Conviene programar riego.';
@@ -1162,7 +1194,6 @@
       lead = 'La humedad del suelo se encuentra en el rango óptimo.';
       tips.push('Mantén la vigilancia de la humedad durante los próximos días.');
     }
-    tips.push(rain > 0 ? 'Precipitación reciente: '+fmt(rain,1)+' mm reportados.' : 'Sin registro de lluvias recientes en la zona.');
     $('recoLead').textContent = lead;
     var check = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
     $('recoList').innerHTML = tips.map(function(t){ return '<li>'+check+'<span>'+t+'</span></li>'; }).join('');
@@ -1204,7 +1235,6 @@
     drawChart();
   }
 
-  /* ---------- Gráfica SVG ---------- */
   var tipEl = null;
   function dayLabels(){
     var out = [], now = new Date();
@@ -1266,27 +1296,21 @@
     $('chartText').textContent = 'Humedad del suelo por día: ' + history.map(function(v,i){ return labels[i].long+' '+fmt(v,1)+'%'; }).join(', ') + '.';
   }
 
-  /* ---------- Mapas Interactivos Leaflet ---------- */
   function initSatelliteMap(){
     if(!$('satelliteMap')) return;
-    
-    // Coordenadas Afueras Sahagún, Córdoba
     var map = L.map('satelliteMap', { zoomControl: false }).setView([8.9472, -75.4418], 13);
     window.satMap = map;
-
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Capa Satelital Esri World Imagery (100% Gratis sin API Key)
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Esri Satellite · Sahagún, Córdoba',
       maxZoom: 18
     }).addTo(map);
 
-    // Delimitación de Fincas en las afueras de la zona urbana de Sahagún
     var fincas = [
-      { name: "Lote La Esperanza (Yuca M-Col)", coords: [[8.9580, -75.4510], [8.9610, -75.4450], [8.9540, -75.4420], [8.9510, -75.4490]], lat: 8.9560, lng: -75.4480 },
-      { name: "Lote El Porvenir (Yuca Taiwanesa)", coords: [[8.9640, -75.4160], [8.9660, -75.4080], [8.9580, -75.4050], [8.9570, -75.4140]], lat: 8.9612, lng: -75.4120 },
-      { name: "Lote San José (Maíz Dulce)", coords: [[8.9350, -75.4650], [8.9380, -75.4570], [8.9290, -75.4550], [8.9280, -75.4630]], lat: 8.9320, lng: -75.4610 }
+      { name: "Lote La Esperanza (Maíz)", coords: [[8.9580, -75.4510], [8.9610, -75.4450], [8.9540, -75.4420], [8.9510, -75.4490]], lat: 8.9560, lng: -75.4480 },
+      { name: "Lote El Porvenir (Yuca)", coords: [[8.9640, -75.4160], [8.9660, -75.4080], [8.9580, -75.4050], [8.9570, -75.4140]], lat: 8.9612, lng: -75.4120 },
+      { name: "Lote San José (Ñame)", coords: [[8.9350, -75.4650], [8.9380, -75.4570], [8.9290, -75.4550], [8.9280, -75.4630]], lat: 8.9320, lng: -75.4610 }
     ];
 
     fincas.forEach(function(f){
@@ -1296,39 +1320,29 @@
         fillOpacity: 0.45,
         weight: 2
       }).addTo(map);
-
       poly.bindPopup("<b>" + f.name + "</b><br>Sector Rural Sahagún<br>Coordenadas: " + f.lat + ", " + f.lng);
     });
   }
 
   function initRainMapOnline(){
     if(!$('rainMapOnline')) return;
-
     var rainMap = L.map('rainMapOnline', { zoomControl: true }).setView([8.9472, -75.4418], 9);
     window.rainMap = rainMap;
 
-    // Mapa base OpenStreetMap Estándar (Sin necesidad de API Key)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap · RainViewer Radar API',
       maxZoom: 18
     }).addTo(rainMap);
 
-    // Conexión API RainViewer Weather Radar Online
     fetch('https://api.rainviewer.com/public/weather-maps.json')
       .then(res => res.json())
       .then(data => {
         if(data && data.radar && data.radar.past && data.radar.past.length > 0) {
           var lastFrame = data.radar.past[data.radar.past.length - 1];
           var radarTileUrl = 'https://tilecache.rainviewer.com' + lastFrame.path + '/256/{z}/{x}/{y}/2/1_1.png';
-          
-          L.tileLayer(radarTileUrl, {
-            opacity: 0.75,
-            tileSize: 256
-          }).addTo(rainMap);
+          L.tileLayer(radarTileUrl, { opacity: 0.75, tileSize: 256 }).addTo(rainMap);
         }
-      }).catch(err => {
-        console.log("Radar RainViewer fallback:", err);
-      });
+      }).catch(err => { console.log("Radar RainViewer fallback:", err); });
   }
 
   function setMode(m, text){
@@ -1352,11 +1366,9 @@
     data.soil = clamp(Math.round((data.soil + (Math.random()-.5)*1.2)*10)/10, 20, 70);
     data.temp = clamp(Math.round((data.temp + (Math.random()-.5)*.8)*10)/10, 15, 40);
     data.air  = clamp(Math.round(data.air + (Math.random()-.5)*3), 40, 98);
-    data.wind = clamp(Math.round((data.wind + (Math.random()-.5)*1.6)*10)/10, 0, 30);
     history[history.length-1] = data.soil;
   }
 
-  /* ---------- Conexión MQTT ---------- */
   function applyReading(obj){
     var changed = false;
     Object.keys(ALIAS).forEach(function(k){
@@ -1430,7 +1442,6 @@
     });
   }
 
-  /* ---------- Modal Dialog MQTT ---------- */
   var dlg = $('mqttDialog');
   function msg(text, kind){ var m = $('mMsg'); if(m){ m.textContent = text; m.className = 'm-msg' + (kind ? ' ' + kind : ''); } }
   function openDialog(){
@@ -1459,7 +1470,6 @@
     connect(url, topic);
   });
 
-  /* ---------- Selector de Lote ---------- */
   if($('selLoteActivo')){
     $('selLoteActivo').addEventListener('change', function(e){
       cambiarLote(e.target.value);
@@ -1476,7 +1486,6 @@
     });
   }
 
-  // Inicializar
   setUpdated(new Date());
   render();
   renderTablaSensores();

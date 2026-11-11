@@ -45,6 +45,16 @@
       --font-body: "Inter", system-ui, -apple-system, sans-serif;
     }
 
+    /* Solución Parpadeo Inicial: Ocultar app hasta que cargue */
+    body:not(.loaded) {
+      background: #030804;
+      overflow: hidden;
+    }
+    body:not(.loaded) .app {
+      opacity: 0;
+      visibility: hidden;
+    }
+
     *, *::before, *::after { box-sizing: border-box; }
     body {
       margin: 0; padding: 0;
@@ -103,7 +113,7 @@
       50% { transform: scale(1.06); box-shadow: 0 0 55px rgba(92, 191, 104, 1); }
     }
 
-    .app { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
+    .app { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; transition: opacity 0.3s ease; }
 
     /* ---------- Barra Lateral Neón ---------- */
     .sidebar {
@@ -317,9 +327,9 @@
     .msg-box.err { color: var(--orange-ink); }
 
     /* =========================================================
-       DISEÑO NEÓN EXCLUSIVO PARA VENTANAS MODALES Y LOGIN
-       Fondo Negro (#030804) + Logo / Acentos Verde Neón con Brillo
-       ========================================================= */
+        DISEÑO NEÓN EXCLUSIVO PARA VENTANAS MODALES Y LOGIN
+        Fondo Negro (#030804) + Logo / Acentos Verde Neón con Brillo
+        ========================================================= */
     dialog { 
       border: 1.5px solid var(--leaf-glow); 
       padding: 0; 
@@ -894,23 +904,22 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
 <script>
-  // Script para la Pantalla de Carga (Splash Screen) con temporizador fluido
+  // Control fluido del Splash Screen y sincronización con el DOM
   window.addEventListener('DOMContentLoaded', () => {
-    let progress = 0;
+    let progress = 10;
     const bar = document.getElementById('splashProgress');
     const splash = document.getElementById('splashScreen');
     
-    const interval = setInterval(() => {
-      progress += Math.floor(Math.random() * 15) + 10;
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(interval);
-        setTimeout(() => {
-          splash.classList.add('fade-out');
-        }, 300);
-      }
-      if(bar) bar.style.width = progress + '%';
-    }, 120);
+    if(bar) bar.style.width = '30%';
+
+    window.addEventListener('load', () => {
+      progress = 100;
+      if(bar) bar.style.width = '100%';
+      setTimeout(() => {
+        if(splash) splash.classList.add('fade-out');
+        document.body.classList.add('loaded');
+      }, 250);
+    });
   });
 </script>
 
@@ -976,12 +985,13 @@
     });
   });
 
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      if(!auth.currentUser) {
+  // Mostrar el login inmediatamente al cargar el DOM si no hay sesión activa
+  window.addEventListener('DOMContentLoaded', () => {
+    if(!auth.currentUser) {
+      if(loginDialog && !loginDialog.open) {
         loginDialog.showModal();
       }
-    }, 1200);
+    }
   });
 
   onAuthStateChanged(auth, async (user) => {
@@ -1010,6 +1020,9 @@
       }
     } else {
       actualizarInterfaz(false);
+      if(loginDialog && !loginDialog.open) {
+        loginDialog.showModal();
+      }
     }
   });
 
@@ -1201,11 +1214,11 @@
 
   var SENSORS = [
     {key:'soil', cls:'soil', label:'Humedad del suelo',    unit:'%',    dec:1, min:0, max:100, icon:'i-drop',
-      status:function(v){ return v<30?['alert','Suelo seco']:v<35?['warn','Cerca del límite']:v<=55?['ok','Rango óptimo']:['warn','Muy húmedo']; }},
-    {key:'temp', cls:'temp', label:'Temperatura ambiente', unit:'°C',   dec:1, min:0, max:45,  icon:'i-thermo',
-      status:function(v){ return v<18?['warn','Fría']:v<=32?['ok','Adecuada']:['alert','Calor alto']; }},
+     status:function(v){ return v<30?['alert','Suelo seco']:v<35?['warn','Cerca del límite']:v<=55?['ok','Rango óptimo']:['warn','Muy húmedo']; }},
+    {key:'temp', cls:'temp', label:'Temperatura ambiente', unit:'°C',    dec:1, min:0, max:45,  icon:'i-thermo',
+     status:function(v){ return v<18?['warn','Fría']:v<=32?['ok','Adecuada']:['alert','Calor alto']; }},
     {key:'air',  cls:'air',  label:'Humedad del aire',     unit:'%',    dec:0, min:0, max:100, icon:'i-waves',
-      status:function(v){ return v<50?['warn','Aire seco']:v<=85?['ok','Normal']:['warn','Muy húmedo']; }}
+     status:function(v){ return v<50?['warn','Aire seco']:v<=85?['ok','Normal']:['warn','Muy húmedo']; }}
   ];
 
   var ALIAS = {

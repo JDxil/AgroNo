@@ -45,7 +45,7 @@
       --font-body: "Inter", system-ui, -apple-system, sans-serif;
     }
 
-    /* Solución Parpadeo Inicial: Ocultar app hasta que cargue */
+    /* Solución para evitar que se vea la app de fondo mientras carga */
     body:not(.loaded) {
       background: #030804;
       overflow: hidden;
@@ -81,7 +81,7 @@
     #splashScreen {
       position: fixed; inset: 0; background: #030804; z-index: 99999;
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
     #splashScreen.fade-out { opacity: 0; visibility: hidden; }
     .splash-logo-box {
@@ -437,7 +437,7 @@
 </head>
 <body>
 
-<!-- Pantalla de Carga Inicial (Splash Screen) -->
+<!-- Pantalla de Carga Inicial (Splash Screen con Barra de Progreso) -->
 <div id="splashScreen">
   <div class="splash-logo-box">
     <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2zm0 3a7 7 0 0 0-7 7c0 3.866 3.134 7 7 7s7-3.134 7-7a7 7 0 0 0-7-7zm0 2.5a4.5 4.5 0 0 1 4.5 4.5c0 1.2-1 3.5-4.5 6.5-3.5-3-4.5-5.3-4.5-6.5a4.5 4.5 0 0 1 4.5-4.5z"/></svg>
@@ -904,21 +904,19 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
 <script>
-  // Control fluido del Splash Screen y sincronización con el DOM
+  // Control fluido de la barra de carga (Splash Screen) sincronizada con el evento load
   window.addEventListener('DOMContentLoaded', () => {
-    let progress = 10;
     const bar = document.getElementById('splashProgress');
     const splash = document.getElementById('splashScreen');
     
-    if(bar) bar.style.width = '30%';
+    if(bar) bar.style.width = '60%';
 
     window.addEventListener('load', () => {
-      progress = 100;
       if(bar) bar.style.width = '100%';
       setTimeout(() => {
         if(splash) splash.classList.add('fade-out');
-        document.body.classList.add('loaded');
-      }, 250);
+        document.body.classList.add('loaded'); // Revela la app suavemente al terminar de cargar
+      }, 300);
     });
   });
 </script>
@@ -985,15 +983,6 @@
     });
   });
 
-  // Mostrar el login inmediatamente al cargar el DOM si no hay sesión activa
-  window.addEventListener('DOMContentLoaded', () => {
-    if(!auth.currentUser) {
-      if(loginDialog && !loginDialog.open) {
-        loginDialog.showModal();
-      }
-    }
-  });
-
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       try {
@@ -1013,10 +1002,10 @@
         }
 
         actualizarInterfaz(true, nombre, rol);
-        loginDialog.close();
+        if(loginDialog.open) loginDialog.close();
       } catch (e) {
         actualizarInterfaz(true, user.email, "usuario");
-        loginDialog.close();
+        if(loginDialog.open) loginDialog.close();
       }
     } else {
       actualizarInterfaz(false);

@@ -718,14 +718,8 @@
             <tbody id="tablaUsuariosBody">
               <tr>
                 <td><strong>Juan David Rua Bravo</strong></td>
-                <td>admin@agrono.com</td>
+                <td>ruabravojuandavid02@gmail.com</td>
                 <td><span class="side-user-role">Administrador</span></td>
-                <td><span class="chip ok">Activo</span></td>
-              </tr>
-              <tr>
-                <td><strong>María Rodríguez</strong></td>
-                <td>user@agrono.com</td>
-                <td><span class="chip" style="background:var(--surface-2); color:var(--ink)">Usuario</span></td>
                 <td><span class="chip ok">Activo</span></td>
               </tr>
             </tbody>
@@ -830,9 +824,9 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
+  // ÚNICO USUARIO ADMINISTRADOR AUTORIZADO
   const LOCAL_USERS = {
-    "admin@agrono.com": { pass: "admin123", name: "Juan David Rua Bravo", role: "admin" },
-    "user@agrono.com": { pass: "user123", name: "María Rodríguez", role: "usuario" }
+    "ruabravojuandavid02@gmail.com": { pass: "juan2007XDX", name: "Juan David Rua Bravo", role: "admin" }
   };
 
   const loginDialog = document.getElementById('loginDialog');

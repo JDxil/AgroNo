@@ -1,0 +1,1493 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>AgroNo - Telemetría y Monitoreo Agrícola Inteligente</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap">
+  
+  <!-- Leaflet CSS para Mapas Satelitales y Radar -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+  <style>
+    :root {
+      --bg: #030804;
+      --surface: rgba(10, 20, 13, 0.94);
+      --surface-2: rgba(18, 37, 24, 0.8);
+      --line: rgba(92, 191, 104, 0.25);
+      --line-bright: rgba(92, 191, 104, 0.45);
+      --ink: #e4f0e6;
+      --muted: #9bb5a1;
+      --forest: #050e07;
+      --forest-2: #0e1e12;
+      --forest-ink: #cfe6d3;
+      --leaf: #3a9a47;
+      --leaf-glow: #5cbf68;
+      --leaf-ink: #8fdb98;
+      --leaf-soft: rgba(58, 154, 71, 0.2);
+      --blue: #3290e6;
+      --blue-ink: #82c4ff;
+      --blue-soft: rgba(50, 144, 230, 0.2);
+      --yellow: #f0b429;
+      --yellow-ink: #fce588;
+      --yellow-soft: rgba(240, 180, 41, 0.2);
+      --orange: #f06529;
+      --orange-ink: #ffbba1;
+      --orange-soft: rgba(240, 101, 41, 0.2);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(58, 154, 71, 0.15);
+      --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+      --font-body: "Inter", system-ui, -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0;
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(58, 154, 71, 0.25) 0%, transparent 45%),
+        radial-gradient(circle at 90% 80%, rgba(92, 191, 104, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(32, 106, 44, 0.15) 0%, transparent 60%);
+      background-attachment: fixed;
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, p { margin: 0; }
+    button { font: inherit; color: inherit; }
+    a { color: inherit; text-decoration: none; }
+    :focus-visible { outline: 3px solid var(--leaf-glow); outline-offset: 2px; border-radius: 8px; }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+    .app { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
+
+    /* ---------- Barra Lateral Neón ---------- */
+    .sidebar {
+      position: sticky; top: 0; align-self: start; height: 100vh;
+      background: rgba(5, 14, 7, 0.95);
+      backdrop-filter: blur(12px);
+      color: var(--forest-ink);
+      display: flex; flex-direction: column; gap: 24px; padding: 24px 16px 20px;
+      border-right: 1px solid var(--line);
+      box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; padding: 0 4px; }
+    .brand-mark {
+      flex: none; width: 44px; height: 44px; border-radius: 14px;
+      background: linear-gradient(135deg, #3a9a47 0%, #1e6629 100%);
+      border: 1px solid var(--line-bright);
+      display: grid; place-items: center; color: #fff;
+      box-shadow: 0 0 20px rgba(92, 191, 104, 0.4);
+    }
+    .brand-mark svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .brand-name { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #fff; letter-spacing: -0.02em; text-shadow: 0 0 10px rgba(92,191,104,0.3); }
+    .brand-name b { color: var(--leaf-glow); }
+    
+    .nav { display: flex; flex-direction: column; gap: 6px; }
+    .nav-btn {
+      display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px;
+      color: var(--muted); font-weight: 500; background: transparent; border: 1px solid transparent;
+      width: 100%; text-align: left; cursor: pointer; transition: all .2s ease;
+    }
+    .nav-btn:hover { background: var(--surface-2); color: #fff; border-color: var(--line); }
+    .nav-btn.active {
+      background: rgba(22, 45, 29, 0.95);
+      color: var(--leaf-glow);
+      border-color: var(--leaf-glow);
+      font-weight: 600;
+      box-shadow: 0 0 15px rgba(92, 191, 104, 0.25);
+    }
+    .nav-btn svg { flex: none; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    .side-user {
+      margin-top: auto; padding: 14px; border-radius: 16px;
+      background: var(--surface-2); border: 1px solid var(--line);
+      font-size: 13px; color: var(--forest-ink); display: flex; flex-direction: column; gap: 8px;
+    }
+    .side-user-info b { display: block; color: #fff; font-weight: 600; font-size: 14px; }
+    .side-user-role {
+      display: inline-block; padding: 2px 8px; border-radius: 99px;
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--leaf-glow); background: var(--leaf-soft); border: 1px solid var(--leaf-glow);
+      font-weight: 700; width: fit-content;
+    }
+    .btn-logout {
+      background: transparent; border: 1px solid var(--line); color: var(--muted);
+      padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      cursor: pointer; text-align: center; width: 100%; transition: all .2s; margin-top: 4px;
+    }
+    .btn-logout:hover { background: var(--leaf-soft); color: #fff; border-color: var(--leaf-glow); }
+
+    /* ---------- Contenido Principal ---------- */
+    .content { min-width: 0; padding-block: 28px 40px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+    .wrap { max-width: 1240px; margin-inline: auto; display: flex; flex-direction: column; gap: 24px; }
+
+    .page-section { display: none; flex-direction: column; gap: 24px; }
+    .page-section.active { display: flex; }
+
+    .head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+    .head-title { min-width: 0; }
+    .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--leaf-glow); text-shadow: 0 0 8px rgba(92,191,104,0.3); }
+    h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 4vw, 36px); line-height: 1.1; letter-spacing: -.02em; margin-top: 4px; color: #fff; }
+    .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 10px; color: var(--muted); font-size: 14px; }
+    
+    .pill { display: inline-flex; align-items: center; gap: 7px; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--yellow-soft); color: var(--yellow-ink); border: 1px solid var(--yellow); }
+    .pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .pill.live { background: var(--leaf-soft); color: var(--leaf-glow); border-color: var(--leaf-glow); }
+    .pill.err { background: var(--orange-soft); color: var(--orange-ink); border-color: var(--orange); }
+
+    .lote-selector { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 6px 14px; }
+    .lote-selector label { font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+    .lote-selector select { background: transparent; border: 0; color: var(--leaf-glow); font-weight: 700; font-size: 15px; cursor: pointer; outline: none; }
+    .lote-selector select option { background: #0c1b11; color: var(--ink); }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px;
+      border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+      font-weight: 600; cursor: pointer; transition: all .2s;
+    }
+    .btn:hover { background: rgba(22, 45, 29, 0.95); border-color: var(--leaf-glow); box-shadow: 0 0 12px rgba(92,191,104,0.3); }
+    .btn:active { transform: translateY(1px); }
+    .btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .btn.primary {
+      background: linear-gradient(135deg, #3a9a47 0%, #1e6629 100%);
+      border: 1px solid rgba(143, 219, 152, 0.4); color: #fff;
+      box-shadow: 0 4px 20px rgba(58, 154, 71, 0.3);
+    }
+    .btn.primary:hover { box-shadow: 0 6px 24px rgba(92, 191, 104, 0.5); }
+    .btn.quiet { background: transparent; }
+
+    /* ---------- Tarjetas de Información ---------- */
+    .lote-info-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .info-box { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
+    .info-box span { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .info-box b { font-size: 16px; color: #fff; font-family: var(--font-display); }
+
+    /* ---------- Tarjetas de Sensores ---------- */
+    .cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; backdrop-filter: blur(10px); transition: border-color .2s; }
+    .card:hover { border-color: var(--line-bright); }
+    .card-top { display: flex; align-items: center; gap: 10px; }
+    .ico { flex: none; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; }
+    .ico-svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .card h3 { font-size: 13.5px; font-weight: 600; color: var(--muted); line-height: 1.25; }
+    .val { font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 2.5vw, 36px); line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; color: #fff; }
+    .unit { font-family: var(--font-body); font-size: 15px; font-weight: 600; color: var(--muted); }
+    .gauge { height: 6px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
+    .gauge i { display: block; height: 100%; border-radius: 99px; background: var(--c); box-shadow: 0 0 8px var(--c); }
+    .chip { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .chip.ok { background: var(--leaf-soft); color: var(--leaf-glow); border: 1px solid var(--leaf-glow); }
+    .chip.warn { background: var(--yellow-soft); color: var(--yellow-ink); border: 1px solid var(--yellow); }
+    .chip.alert { background: var(--orange-soft); color: var(--orange-ink); border: 1px solid var(--orange); }
+    
+    .card.soil { --c: var(--blue); } .card.soil .ico { background: var(--blue-soft); color: var(--blue-ink); border: 1px solid var(--blue); }
+    .card.temp { --c: var(--yellow); } .card.temp .ico { background: var(--yellow-soft); color: var(--yellow-ink); border: 1px solid var(--yellow); }
+    .card.air { --c: var(--blue); } .card.air .ico { background: var(--blue-soft); color: var(--blue-ink); border: 1px solid var(--blue); }
+    .card.wind { --c: var(--leaf-glow); } .card.wind .ico { background: var(--leaf-soft); color: var(--leaf-glow); border: 1px solid var(--leaf-glow); }
+    .card.rain { --c: var(--blue); } .card.rain .ico { background: var(--blue-soft); color: var(--blue-ink); border: 1px solid var(--blue); }
+
+    .row { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 24px; }
+
+    /* ---------- Paneles y Gráfica ---------- */
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); padding: 22px; min-width: 0; backdrop-filter: blur(12px); }
+    .panel-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 14px; margin-bottom: 18px; }
+    h2 { font-family: var(--font-display); font-weight: 600; font-size: 20px; letter-spacing: -.01em; color: #fff; }
+    .sub { color: var(--muted); font-size: 13.5px; }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); }
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .legend i { width: 14px; height: 4px; border-radius: 3px; background: var(--blue); }
+    .legend i.band { height: 12px; width: 14px; border-radius: 3px; background: var(--leaf-soft); border: 1px solid var(--leaf-glow); }
+    
+    .chart { position: relative; width: 100%; touch-action: pan-y; }
+    .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .g-line { stroke: var(--line); stroke-width: 1; }
+    .g-axis { fill: var(--muted); font: 12px var(--font-body); font-variant-numeric: tabular-nums; }
+    .g-band { fill: var(--leaf-soft); opacity: .6; }
+    .g-band-label { fill: var(--leaf-glow); font: 600 11.5px var(--font-body); }
+    .g-path { fill: none; stroke: var(--blue); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .g-dot { fill: var(--bg); stroke: var(--blue); stroke-width: 2.5; }
+    .g-dot.last { fill: var(--blue); }
+    .g-val { fill: #fff; font: 700 13px var(--font-body); font-variant-numeric: tabular-nums; }
+    .g-hover { stroke: var(--blue); stroke-width: 1; stroke-dasharray: 3 3; }
+    .tip { position: absolute; pointer-events: none; background: #050e07; border: 1px solid var(--line-bright); color: #fff; border-radius: 10px; padding: 6px 12px; font-size: 12.5px; line-height: 1.35; white-space: nowrap; transform: translate(-50%,-100%); box-shadow: var(--shadow); }
+    .tip b { font-variant-numeric: tabular-nums; color: var(--leaf-glow); }
+
+    /* ---------- Mapa Leaflet ---------- */
+    .map-container {
+      position: relative; width: 100%; height: 320px; border-radius: 18px;
+      border: 1px solid var(--line-bright); overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index: 1;
+    }
+    #satelliteMap, #rainMapOnline { width: 100%; height: 100%; background: #0d1a10; }
+
+    .leaflet-popup-content-wrapper {
+      background: var(--surface) !important;
+      color: #fff !important;
+      border: 1px solid var(--line-bright) !important;
+      border-radius: 12px !important;
+      box-shadow: var(--shadow) !important;
+    }
+    .leaflet-popup-tip { background: var(--surface) !important; }
+
+    /* ---------- Diagnóstico Nodos y Alertas ---------- */
+    .counts { display: flex; gap: 10px; margin-bottom: 14px; }
+    .count { flex: 1; border-radius: 14px; padding: 12px; background: var(--leaf-soft); color: var(--leaf-glow); border: 1px solid var(--leaf-glow); }
+    .count.review { background: var(--orange-soft); color: var(--orange-ink); border-color: var(--orange); }
+    .count b { display: block; font-family: var(--font-display); font-size: 26px; line-height: 1.1; }
+    .count span { font-size: 13px; font-weight: 600; }
+    .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+    .dev { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+    .dev:first-child { border-top: 0; }
+    .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--leaf-glow); box-shadow: 0 0 10px var(--leaf-glow); }
+    .dev.review .dot { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+    .dev-main { min-width: 0; flex: 1; }
+    .dev-name { font-weight: 600; font-size: 14.5px; color: #fff; }
+    .dev-topic { font: 12px/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--muted); overflow-wrap: anywhere; }
+    .dev-state { flex: none; text-align: right; font-size: 12.5px; color: var(--muted); }
+    .dev-state b { display: block; font-size: 13px; color: var(--leaf-glow); }
+    .dev.review .dev-state b { color: var(--orange-ink); }
+
+    .alert-item { display: flex; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+    .alert-item:first-child { border-top: 0; padding-top: 0; }
+    .a-ico { flex: none; width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--orange-soft); color: var(--orange-ink); border: 1px solid var(--orange); }
+    .a-ico.done { background: var(--leaf-soft); color: var(--leaf-glow); border-color: var(--leaf-glow); }
+    .a-ico svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+    .a-main { min-width: 0; flex: 1; }
+    .a-title { font-weight: 600; color: #fff; }
+    .a-text { color: var(--muted); font-size: 14px; }
+    .a-when { flex: none; font-size: 12.5px; color: var(--muted); text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+    /* Recomendación Agronómica */
+    .reco { background: linear-gradient(145deg, rgba(14,30,18,0.95), rgba(5,14,7,0.95)); color: var(--forest-ink); border-color: var(--line-bright); }
+    .reco h2 { color: #fff; }
+    .reco .sub { color: var(--muted); }
+    .reco-lead { font-family: var(--font-display); font-size: 20px; line-height: 1.3; font-weight: 600; color: var(--leaf-glow); margin-bottom: 14px; text-wrap: balance; }
+    .reco ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 14.5px; }
+    .reco li { display: flex; gap: 10px; }
+    .reco li svg { flex: none; width: 20px; height: 20px; margin-top: 2px; fill: none; stroke: var(--leaf-glow); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Configuración y Tablas */
+    .cfg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+    .cfg div { background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; min-width: 0; }
+    .cfg dt { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+    .cfg dd { margin: 4px 0 0; font-weight: 600; overflow-wrap: anywhere; color: #fff; }
+    details { margin-top: 16px; color: var(--muted); font-size: 14px; }
+    summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+    pre { margin: 10px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); overflow-x: auto; font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--ink); }
+
+    .data-table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px; }
+    .data-table th, .data-table td { padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .data-table th { background: var(--surface-2); font-weight: 600; color: var(--muted); text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; }
+    .data-table tr:hover td { background: var(--surface-2); }
+    .data-table td { color: #fff; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-weight: 600; font-size: 14px; color: var(--forest-ink); }
+    .field input, .field select { min-height: 46px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface-2); color: #fff; padding: 0 14px; font-size: 14.5px; }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--leaf-glow); box-shadow: 0 0 15px rgba(92,191,104,0.3); }
+    .hint { font-size: 13px; color: var(--muted); }
+
+    .msg-box { font-size: 13.5px; font-weight: 500; min-height: 18px; margin-top: 8px; }
+    .msg-box.ok { color: var(--leaf-glow); }
+    .msg-box.err { color: var(--orange-ink); }
+
+    /* Ventanas Modales Neón Generales */
+    dialog { border: 1px solid var(--line-bright); padding: 0; border-radius: 24px; width: calc(100% - 32px); max-width: 460px; background: rgba(10, 20, 13, 0.96); color: var(--ink); box-shadow: var(--shadow); backdrop-filter: blur(12px); z-index: 1000; }
+    dialog::backdrop { background: rgba(3, 8, 4, 0.85); backdrop-filter: blur(8px); }
+    .m-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 24px 24px 10px; border-bottom: 1px solid var(--line); }
+    .m-head h2 { font-size: 22px; color: #fff; font-family: var(--font-display); }
+    .m-close { flex: none; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); cursor: pointer; display: grid; place-items: center; }
+    .m-close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+    .m-body { padding: 18px 24px 8px; display: flex; flex-direction: column; gap: 16px; }
+    .m-msg { min-height: 20px; font-size: 13.5px; font-weight: 500; margin: 0; }
+    .m-msg.err { color: var(--orange-ink); }
+    .m-msg.ok { color: var(--leaf-glow); }
+    .m-foot { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; padding: 10px 24px 24px; }
+
+    /* Modal Login */
+    dialog#loginDialog { border-color: rgba(92, 191, 104, 0.4); }
+    dialog#loginDialog .m-head h2 { text-shadow: 0 0 12px rgba(92, 191, 104, 0.4); }
+
+    .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: #050e07; border: 1px solid var(--line-bright); color: #fff; padding: 12px 20px; border-radius: 14px; font-size: 14px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5000; max-width: calc(100% - 32px); box-shadow: var(--shadow); }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 1180px) {
+      .cards { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+      .card { grid-column: span 2; }
+      .card:nth-child(n+4) { grid-column: span 3; }
+      .lote-info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 1000px) {
+      .row { grid-template-columns: minmax(0, 1fr); }
+      .cfg { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      .app { grid-template-columns: minmax(0, 1fr); }
+      .sidebar { position: fixed; inset: auto 0 0 0; height: auto; z-index: 2000; flex-direction: row; gap: 0; padding: 6px; border-top: 1px solid var(--line); border-right: 0; }
+      .brand, .side-user { display: none !important; }
+      .nav { flex-direction: row; width: 100%; gap: 2px; }
+      .nav-btn { flex: 1; min-width: 0; flex-direction: column; gap: 3px; padding: 7px 2px; font-size: 11px; text-align: center; border-radius: 10px; justify-content: center; }
+      .content { padding-block: 18px calc(96px + env(safe-area-inset-bottom, 0px)); }
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card, .card:nth-child(n+4) { grid-column: auto; }
+      .card:first-child { grid-column: 1 / -1; }
+      .lote-info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 6.2 6 10.5a6 6 0 0 1-12 0C6 9.2 12 3 12 3z"/></symbol>
+  <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M10 14.5V5a2 2 0 1 1 4 0v9.5a4 4 0 1 1-4 0z"/></symbol>
+  <symbol id="i-waves" viewBox="0 0 24 24"><path d="M3 8c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 13c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></symbol>
+  <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8"/></symbol>
+  <symbol id="i-rain" viewBox="0 0 24 24"><path d="M7 15a4 4 0 1 1 1-7.9A5.5 5.5 0 0 1 18.5 9.5 3.2 3.2 0 0 1 18 15H7zM8 18.5l-1 2M12 18.5l-1 2M16 18.5l-1 2"/></symbol>
+  <symbol id="i-cloud-rain" viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242M16 14v6M8 14v6M12 16v6"/></symbol>
+</svg>
+
+<div class="app">
+  <!-- Barra Lateral AgroNo -->
+  <aside class="sidebar">
+    <a class="brand" href="#resumen">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2zm0 3a7 7 0 0 0-7 7c0 3.866 3.134 7 7 7s7-3.134 7-7a7 7 0 0 0-7-7zm0 2.5a4.5 4.5 0 0 1 4.5 4.5c0 1.2-1 3.5-4.5 6.5-3.5-3-4.5-5.3-4.5-6.5a4.5 4.5 0 0 1 4.5-4.5z"/></svg>
+      </span>
+      <span class="brand-name">Agro<b>No</b></span>
+    </a>
+
+    <!-- Navegación SPA -->
+    <nav class="nav">
+      <button class="nav-btn active" data-target="page-resumen">
+        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
+        <span>Resumen General</span>
+      </button>
+
+      <button class="nav-btn" data-target="page-sensores">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9M4.7 4.7a10.4 10.4 0 0 0 0 14.6M19.3 4.7a10.4 10.4 0 0 1 0 14.6"/></svg>
+        <span>Red de Sensores</span>
+      </button>
+
+      <button class="nav-btn" data-target="page-radar-lluvias">
+        <svg viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242M16 14v6M8 14v6M12 16v6"/></svg>
+        <span>Mapa de Lluvias Online</span>
+      </button>
+
+      <button class="nav-btn admin-only" data-target="page-sembradios" style="display:none">
+        <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span>Gestión Sembradíos</span>
+      </button>
+
+      <button class="nav-btn admin-only" data-target="page-usuarios" style="display:none">
+        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 1 0 7.75"/></svg>
+        <span>Gestión Usuarios</span>
+      </button>
+    </nav>
+
+    <!-- Estado de Perfil y Logout -->
+    <div class="side-user" id="userBox" style="display:none">
+      <div class="side-user-info">
+        <b id="userName">Cargando...</b>
+        <span id="userRole" class="side-user-role">...</span>
+      </div>
+      <button class="btn-logout" id="btnLogout" type="button">Cerrar Sesión</button>
+    </div>
+  </aside>
+
+  <!-- Área de Contenido Principal -->
+  <main class="content">
+    <div class="wrap">
+
+      <!-- ================= 1. PÁGINA RESUMEN ================= -->
+      <section id="page-resumen" class="page-section active">
+        <header class="head">
+          <div class="head-title">
+            <p class="eyebrow">AgroNo Telemetry System</p>
+            <h1 id="lblLoteActual">Lote La Esperanza</h1>
+            <p class="meta">
+              <span id="conn" class="pill">Datos de demostración</span>
+              <span>Última actualización: <time id="updated">—</time></span>
+            </p>
+          </div>
+
+          <div class="lote-selector">
+            <label for="selLoteActivo">Sembradío Activo:</label>
+            <select id="selLoteActivo">
+              <option value="lote1">Lote La Esperanza (Sahagún Norte)</option>
+              <option value="lote2">Lote El Porvenir (Sahagún Este)</option>
+              <option value="lote3">Lote San José (Sahagún Sur)</option>
+            </select>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" id="btnRefresh" type="button">
+              <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4.5L4 9M4 5v4h4M4 13a8 8 0 0 0 14 4.5L20 15M20 19v-4h-4"/></svg>Actualizar
+            </button>
+            <button class="btn" id="btnConfig" type="button">
+              <svg viewBox="0 0 24 24"><path d="M5 12a7 7 0 0 1 14 0M8.5 12a3.5 3.5 0 0 1 7 0M12 12v.01M12 16v4"/></svg>MQTT Config
+            </button>
+          </div>
+        </header>
+
+        <!-- Métricas del Sembradío Activo -->
+        <div class="lote-info-grid">
+          <div class="info-box">
+            <span>Coordenadas GPS</span>
+            <b id="infCoords">8.9560° N, 75.4480° W</b>
+          </div>
+          <div class="info-box">
+            <span>Área & Variedad</span>
+            <b id="infArea">4.5 Ha · M-Col 2215</b>
+          </div>
+          <div class="info-box">
+            <span>Etapa de Cultivo</span>
+            <b id="infEtapa">Engrose de Raíz (Mes 5)</b>
+          </div>
+          <div class="info-box">
+            <span>Días desde Siembra</span>
+            <b id="infDias">142 Días</b>
+          </div>
+        </div>
+
+        <!-- Tarjetas dinámicas de Sensores -->
+        <div class="cards" id="cards"></div>
+
+        <!-- Gráfica e Historial con Mapa Satelital Real de Sahagún -->
+        <div class="row">
+          <section class="panel" id="historial">
+            <div class="panel-head">
+              <div>
+                <h2>Humedad del Suelo</h2>
+                <p class="sub">Últimos 7 días, promedio diario del lote</p>
+              </div>
+              <div class="legend">
+                <span><i></i>Humedad del suelo</span>
+                <span><i class="band"></i>Rango óptimo 35–55 %</span>
+              </div>
+            </div>
+            <div class="chart" id="chart" role="img" aria-label="Gráfica de humedad del suelo"></div>
+            <p class="sr" id="chartText"></p>
+          </section>
+
+          <!-- Mapa Satelital Real de Fincas (Sahagún, Córdoba) -->
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Fincas & Ubicación Satelital</h2>
+                <p class="sub">Sahagún, Córdoba (Avanzada Rural)</p>
+              </div>
+            </div>
+            <div class="map-container">
+              <div id="satelliteMap"></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Alertas y Recomendación -->
+        <div class="row">
+          <section class="panel" id="alertas">
+            <div class="panel-head">
+              <div>
+                <h2>Alertas Recientes del Lote</h2>
+                <p class="sub">Registro específico de este sembradío</p>
+              </div>
+            </div>
+            <div id="alertsContainer">
+              <div class="alert-item">
+                <span class="a-ico"><svg viewBox="0 0 24 24"><path d="M12 4 3 20h18zM12 10v4M12 17v.01"/></svg></span>
+                <div class="a-main"><div class="a-title">Sensor de humedad de suelo centro fuera de rango</div><div class="a-text">Lectura reportó descenso por debajo de la cota mínima esperada.</div></div>
+                <div class="a-when"><span>Hoy, 06:10</span><span class="chip warn">Revisar</span></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel reco">
+            <div class="panel-head">
+              <div>
+                <h2>Recomendación Agronómica</h2>
+                <p class="sub">Diagnóstico automatizado AgroNo</p>
+              </div>
+            </div>
+            <p class="reco-lead" id="recoLead">La humedad del suelo se encuentra en el rango óptimo.</p>
+            <ul id="recoList">
+              <li><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>No se requiere riego el día de hoy para este sector.</span></li>
+            </ul>
+          </section>
+        </div>
+
+        <!-- Configuración MQTT -->
+        <section class="panel" id="configuracion">
+          <div class="panel-head">
+            <div>
+              <h2>Configuración Broker MQTT</h2>
+              <p class="sub">Conexión en tiempo real por WebSockets</p>
+            </div>
+            <button class="btn" id="btnConfig2" type="button">Configurar Broker</button>
+          </div>
+          <dl class="cfg" style="margin-bottom:0">
+            <div><dt>Estado Broker</dt><dd id="cfgState">Datos de demostración</dd></div>
+            <div><dt>Dirección WebSocket</dt><dd id="cfgUrl">Sin configurar</dd></div>
+            <div><dt>Tópico Activo</dt><dd id="cfgTopic">cultivo/yuca/+/sensores</dd></div>
+          </dl>
+        </section>
+      </section>
+
+      <!-- ================= 2. PÁGINA SENSORES ================= -->
+      <section id="page-sensores" class="page-section">
+        <header class="head">
+          <div>
+            <p class="eyebrow">Red Telemétrica</p>
+            <h1>Nodos y Dispositivos de Campo</h1>
+          </div>
+        </header>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Lista de Nodos por Sembradío</h2>
+            <button class="btn primary">+ Vincular Nodo</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Sembradío</th>
+                <th>ID Nodo</th>
+                <th>Tópico MQTT</th>
+                <th>Batería</th>
+                <th>Señal RSSI</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tablaSensoresDetalle"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= 3. PÁGINA MAPA DE LLUVIAS ONLINE (OPENSTREETMAP + RAINVIEWER) ================= -->
+      <section id="page-radar-lluvias" class="page-section">
+        <header class="head">
+          <div>
+            <p class="eyebrow">Radar Satelital en Vivo</p>
+            <h1>Mapa e Isoyetas de Lluvias Online</h1>
+          </div>
+        </header>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Precipitación y Cobertura Nubosa Online (Sahagún y Córdoba)</h2>
+              <p class="sub">Conexión gratuita OpenStreetMap + RainViewer Radar API</p>
+            </div>
+          </div>
+          <div class="map-container" style="height: 480px;">
+            <div id="rainMapOnline"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. PÁGINA GESTIÓN SEMBRADÍOS (ADMIN) ================= -->
+      <section id="page-sembradios" class="page-section admin-only" style="display:none">
+        <header class="head">
+          <div>
+            <p class="eyebrow">Administración Agrícola</p>
+            <h1>Gestión de Sembradíos</h1>
+          </div>
+        </header>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Registrar Nuevo Lote de Cultivo</h2>
+          </div>
+          <form id="formSembradio">
+            <div class="form-grid">
+              <div class="field">
+                <label for="loteNombre">Nombre del Lote</label>
+                <input type="text" id="loteNombre" required>
+              </div>
+              <div class="field">
+                <label for="loteCultivo">Tipo de Cultivo</label>
+                <select id="loteCultivo">
+                  <option value="Yuca">Yuca</option>
+                  <option value="Maíz">Maíz</option>
+                  <option value="Plátano">Plátano</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="loteArea">Área (Hectáreas)</label>
+                <input type="number" step="0.1" id="loteArea" required>
+              </div>
+              <div class="field">
+                <label for="loteGPS">Coordenadas GPS</label>
+                <input type="text" id="loteGPS" required>
+              </div>
+            </div>
+            <button type="submit" class="btn primary">Guardar Sembradío en Firestore</button>
+            <p id="loteMsg" class="msg-box"></p>
+          </form>
+
+          <h2 style="margin-top:28px">Sembradíos Registrados</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Cultivo</th>
+                <th>Hectáreas</th>
+                <th>Coordenadas GPS</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaSembradiosBody">
+              <tr>
+                <td><strong>Lote La Esperanza</strong></td>
+                <td>Yuca M-Col</td>
+                <td>4.5 Ha</td>
+                <td>8.9560° N, 75.4480° W</td>
+                <td><button class="btn" style="min-height:30px; padding:0 10px; font-size:12px">Editar</button></td>
+              </tr>
+              <tr>
+                <td><strong>Lote El Porvenir</strong></td>
+                <td>Yuca Taiwanesa</td>
+                <td>3.2 Ha</td>
+                <td>8.9612° N, 75.4120° W</td>
+                <td><button class="btn" style="min-height:30px; padding:0 10px; font-size:12px">Editar</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= 5. PÁGINA GESTIÓN USUARIOS (ADMIN) ================= -->
+      <section id="page-usuarios" class="page-section admin-only" style="display:none">
+        <header class="head">
+          <div>
+            <p class="eyebrow">Control de Accesos</p>
+            <h1>Gestión de Usuarios</h1>
+          </div>
+        </header>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Registrar Nuevo Usuario en Firestore</h2>
+          </div>
+          
+          <form id="formUsuario">
+            <div class="form-grid">
+              <div class="field">
+                <label for="usrNombre">Nombre Completo</label>
+                <input type="text" id="usrNombre" required>
+              </div>
+              <div class="field">
+                <label for="usrEmail">Correo Electrónico</label>
+                <input type="email" id="usrEmail" required>
+              </div>
+              <div class="field">
+                <label for="usrPassword">Contraseña de Acceso</label>
+                <input type="password" id="usrPassword" required>
+              </div>
+              <div class="field">
+                <label for="usrRol">Rol Asignado</label>
+                <select id="usrRol">
+                  <option value="usuario">Usuario / Operador</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn primary">Guardar Usuario en Base de Datos</button>
+            <p id="usrMsg" class="msg-box"></p>
+          </form>
+
+          <h2 style="margin-top:28px">Usuarios Registrados</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tablaUsuariosBody">
+              <tr>
+                <td><strong>Juan David Rua Bravo</strong></td>
+                <td>admin@agrono.com</td>
+                <td><span class="side-user-role">Administrador</span></td>
+                <td><span class="chip ok">Activo</span></td>
+              </tr>
+              <tr>
+                <td><strong>María Rodríguez</strong></td>
+                <td>user@agrono.com</td>
+                <td><span class="chip" style="background:var(--surface-2); color:var(--ink)">Usuario</span></td>
+                <td><span class="chip ok">Activo</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal Configurar MQTT -->
+<dialog id="mqttDialog">
+  <form id="mqttForm" novalidate>
+    <div class="m-head">
+      <div>
+        <h2>Conectar Broker Mosquitto</h2>
+        <p class="sub" style="margin-top:2px">Requiere un puerto Listener WebSocket activo en el broker.</p>
+      </div>
+      <button class="m-close" type="button" id="mClose" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="m-body">
+      <div class="field">
+        <label for="wsUrl">Dirección WebSocket</label>
+        <input id="wsUrl" name="wsUrl" type="text" inputmode="url">
+        <span class="hint">Ejemplo: ws://192.168.1.10:9001</span>
+      </div>
+      <div class="field">
+        <label for="mqttTopic">Tópico MQTT</label>
+        <input id="mqttTopic" name="mqttTopic" type="text" value="cultivo/yuca/+/sensores">
+      </div>
+      <p class="m-msg" id="mMsg" role="status" aria-live="polite"></p>
+    </div>
+    <div class="m-foot">
+      <button class="btn quiet" type="button" id="mDisc" hidden>Desconectar</button>
+      <button class="btn" type="button" id="mCancel">Cancelar</button>
+      <button class="btn primary" type="submit" id="mConnect">Conectar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Modal Iniciar Sesión -->
+<dialog id="loginDialog">
+  <form id="loginForm">
+    <div class="m-head">
+      <div>
+        <h2>Acceso a AgroNo</h2>
+        <p class="sub" style="margin-top:2px">Ingresa tus credenciales registradas en la plataforma.</p>
+      </div>
+    </div>
+    <div class="m-body">
+      <div class="field">
+        <label for="loginEmail">Correo Electrónico</label>
+        <input type="email" id="loginEmail" required>
+      </div>
+      <div class="field">
+        <label for="loginPassword">Contraseña</label>
+        <input type="password" id="loginPassword" required>
+      </div>
+      <p id="loginError" class="m-msg err"></p>
+    </div>
+    <div class="m-foot">
+      <button type="submit" class="btn primary" style="width:100%">Ingresar a la Plataforma</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- SDKs: MQTT + LeafletJS + Firebase v10 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.10.1/mqtt.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    signOut, 
+    onAuthStateChanged 
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { 
+    getFirestore, 
+    doc, 
+    setDoc,
+    getDoc 
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB7f0pCoOpGLLI45QZ_4zH1o_CcxRzjMFs",
+    authDomain: "agrono-481a9.firebaseapp.com",
+    projectId: "agrono-481a9",
+    storageBucket: "agrono-481a9.firebasestorage.app",
+    messagingSenderId: "430834477730",
+    appId: "1:430834477730:web:5be6373e3deaae41ca45fb",
+    measurementId: "G-S19CTK6K0W"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const LOCAL_USERS = {
+    "admin@agrono.com": { pass: "admin123", name: "Juan David Rua Bravo", role: "admin" },
+    "user@agrono.com": { pass: "user123", name: "María Rodríguez", role: "usuario" }
+  };
+
+  const loginDialog = document.getElementById('loginDialog');
+  const loginForm = document.getElementById('loginForm');
+  const loginError = document.getElementById('loginError');
+  const userBox = document.getElementById('userBox');
+  const userName = document.getElementById('userName');
+  const userRole = document.getElementById('userRole');
+  const btnLogout = document.getElementById('btnLogout');
+
+  // Navegación SPA
+  const navButtons = document.querySelectorAll('.nav-btn');
+  const pageSections = document.querySelectorAll('.page-section');
+
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      navButtons.forEach(b => b.classList.remove('active'));
+      pageSections.forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(targetId).classList.add('active');
+
+      if(targetId === 'page-resumen' && window.satMap) {
+        setTimeout(() => window.satMap.invalidateSize(), 200);
+      }
+      if(targetId === 'page-radar-lluvias' && window.rainMap) {
+        setTimeout(() => window.rainMap.invalidateSize(), 200);
+      }
+    });
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    loginDialog.showModal();
+  });
+
+  // Estado de Autenticación de Firebase Auth
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        const userRef = doc(db, "usuarios", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        let rol = "usuario";
+        let nombre = user.email;
+
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          rol = data.rol || "usuario";
+          nombre = data.nombre || user.email;
+        } else if (LOCAL_USERS[user.email]) {
+          rol = LOCAL_USERS[user.email].role;
+          nombre = LOCAL_USERS[user.email].name;
+        }
+
+        actualizarInterfaz(true, nombre, rol);
+        loginDialog.close();
+      } catch (e) {
+        actualizarInterfaz(true, user.email, "usuario");
+        loginDialog.close();
+      }
+    } else {
+      actualizarInterfaz(false);
+      loginDialog.showModal();
+    }
+  });
+
+  // Formulario de Inicio de Sesión
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.textContent = "";
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      if (LOCAL_USERS[email] && LOCAL_USERS[email].pass === password) {
+        const userLocal = LOCAL_USERS[email];
+        actualizarInterfaz(true, userLocal.name, userLocal.role);
+        loginDialog.close();
+      } else {
+        loginError.textContent = "Correo o contraseña incorrectos.";
+      }
+    }
+  });
+
+  // Registro de Usuario en Firestore
+  const formUsuario = document.getElementById('formUsuario');
+  const usrMsg = document.getElementById('usrMsg');
+  const tablaUsuariosBody = document.getElementById('tablaUsuariosBody');
+
+  if (formUsuario) {
+    formUsuario.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      usrMsg.textContent = "Guardando en Firestore...";
+      usrMsg.className = "msg-box";
+
+      const nombre = document.getElementById('usrNombre').value.trim();
+      const email = document.getElementById('usrEmail').value.trim();
+      const password = document.getElementById('usrPassword').value.trim();
+      const rol = document.getElementById('usrRol').value;
+
+      try {
+        const docId = email.replace(/[@.]/g, "_");
+
+        await setDoc(doc(db, "usuarios", docId), {
+          nombre: nombre,
+          email: email,
+          rol: rol,
+          fechaCreacion: new Date().toISOString(),
+          estado: "activo"
+        });
+
+        usrMsg.textContent = `¡Usuario ${nombre} guardado en AgroNo!`;
+        usrMsg.className = "msg-box ok";
+      } catch (err) {
+        usrMsg.textContent = `Usuario ${nombre} agregado localmente.`;
+        usrMsg.className = "msg-box ok";
+      }
+
+      const tr = document.createElement('tr');
+      const rolBadge = (rol === 'admin') 
+        ? '<span class="side-user-role">Administrador</span>' 
+        : '<span class="chip" style="background:var(--surface-2); color:var(--ink)">Usuario</span>';
+        
+      tr.innerHTML = `
+        <td><strong>${nombre}</strong></td>
+        <td>${email}</td>
+        <td>${rolBadge}</td>
+        <td><span class="chip ok">Activo</span></td>
+      `;
+      tablaUsuariosBody.appendChild(tr);
+      formUsuario.reset();
+    });
+  }
+
+  // Registro de Sembradío en Firestore
+  const formSembradio = document.getElementById('formSembradio');
+  const loteMsg = document.getElementById('loteMsg');
+  const tablaSembradiosBody = document.getElementById('tablaSembradiosBody');
+
+  if (formSembradio) {
+    formSembradio.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById('loteNombre').value.trim();
+      const cultivo = document.getElementById('loteCultivo').value;
+      const area = document.getElementById('loteArea').value;
+      const gps = document.getElementById('loteGPS').value;
+
+      try {
+        await setDoc(doc(db, "sembradios", "lote_" + Date.now()), {
+          nombre: nombre,
+          cultivo: cultivo,
+          area: area,
+          gps: gps
+        });
+      } catch(err){}
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${nombre}</strong></td>
+        <td>${cultivo}</td>
+        <td>${area} Ha</td>
+        <td>${gps}</td>
+        <td><button class="btn" style="min-height:30px; padding:0 10px; font-size:12px">Editar</button></td>
+      `;
+      tablaSembradiosBody.appendChild(tr);
+      loteMsg.textContent = `Sembradío "${nombre}" registrado correctamente.`;
+      loteMsg.className = "msg-box ok";
+      formSembradio.reset();
+    });
+  }
+
+  // Cerrar Sesión
+  btnLogout.addEventListener('click', () => {
+    signOut(auth).catch(() => {});
+    actualizarInterfaz(false);
+    loginDialog.showModal();
+  });
+
+  function actualizarInterfaz(autenticado, nombre = "", rol = "") {
+    if (autenticado) {
+      userBox.style.display = "flex";
+      userName.textContent = nombre;
+      userRole.textContent = rol === 'admin' ? 'Administrador' : 'Usuario';
+
+      const esAdmin = (rol === 'admin');
+      document.querySelectorAll('.admin-only').forEach(el => {
+        el.style.display = esAdmin ? '' : 'none';
+      });
+    } else {
+      userBox.style.display = "none";
+      document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+      document.getElementById('loginEmail').value = "";
+      document.getElementById('loginPassword').value = "";
+    }
+  }
+</script>
+
+<!-- Script IIFE: Mapas Leaflet Satelital, OpenStreetMap + RainViewer Radar API y Telemetría -->
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------- Datos Multilote AgroNo ---------- */
+  var LOTES_DATA = {
+    lote1: {
+      nombre: "Lote La Esperanza",
+      coords: "8.9560° N, 75.4480° W",
+      lat: 8.9560, lng: -75.4480,
+      area: "4.5 Ha · M-Col 2215",
+      etapa: "Engrose de Raíz (Mes 5)",
+      dias: "142 Días",
+      sensorsCount: 4,
+      sensors: { soil: 42.5, temp: 28.1, air: 76, wind: 4.2, rain: 0.0 },
+      history: [49.8, 47.6, 45.1, 42.3, 40.1, 38.4, 42.5],
+      nodes: [
+        { sembradio:"Lote La Esperanza", id: "NODE-01", topic: "cultivo/yuca/suelo1", bat: "98%", rssi: "-65 dBm", state: "ok" },
+        { sembradio:"Lote La Esperanza", id: "NODE-02", topic: "cultivo/yuca/clima", bat: "92%", rssi: "-70 dBm", state: "ok" },
+        { sembradio:"Lote La Esperanza", id: "NODE-03", topic: "cultivo/yuca/viento", bat: "45%", rssi: "-82 dBm", state: "warn" }
+      ]
+    },
+    lote2: {
+      nombre: "Lote El Porvenir",
+      coords: "8.9612° N, 75.4120° W",
+      lat: 8.9612, lng: -75.4120,
+      area: "3.2 Ha · Taiwanesa",
+      etapa: "Crecimiento Foliar (Mes 2)",
+      dias: "68 Días",
+      sensorsCount: 3,
+      sensors: { soil: 34.1, temp: 30.4, air: 68, wind: 6.5, rain: 2.5 },
+      history: [31.0, 32.5, 30.2, 29.8, 33.0, 35.2, 34.1],
+      nodes: [
+        { sembradio:"Lote El Porvenir", id: "NODE-04", topic: "cultivo/yuca2/suelo", bat: "100%", rssi: "-60 dBm", state: "ok" },
+        { sembradio:"Lote El Porvenir", id: "NODE-05", topic: "cultivo/yuca2/clima", bat: "88%", rssi: "-74 dBm", state: "ok" }
+      ]
+    },
+    lote3: {
+      nombre: "Lote San José",
+      coords: "8.9320° N, 75.4610° W",
+      lat: 8.9320, lng: -75.4610,
+      area: "5.0 Ha · Maíz Dulce",
+      etapa: "Floración / Jiloteo",
+      dias: "52 Días",
+      sensorsCount: 5,
+      sensors: { soil: 51.2, temp: 27.5, air: 82, wind: 3.1, rain: 12.0 },
+      history: [55.0, 54.2, 53.1, 52.0, 51.5, 50.8, 51.2],
+      nodes: [
+        { sembradio:"Lote San José", id: "NODE-06", topic: "cultivo/maiz/suelo1", bat: "95%", rssi: "-62 dBm", state: "ok" },
+        { sembradio:"Lote San José", id: "NODE-07", topic: "cultivo/maiz/lluvia", bat: "91%", rssi: "-68 dBm", state: "ok" }
+      ]
+    }
+  };
+
+  var loteActualKey = 'lote1';
+  var data = LOTES_DATA[loteActualKey].sensors;
+  var history = LOTES_DATA[loteActualKey].history;
+  var DAYS = ['dom','lun','mar','mié','jue','vie','sáb'];
+  var mode = 'demo';
+  var client = null;
+
+  var SENSORS = [
+    {key:'soil', cls:'soil', label:'Humedad del suelo',    unit:'%',    dec:1, min:0, max:100, icon:'i-drop',
+      status:function(v){ return v<30?['alert','Suelo seco']:v<35?['warn','Cerca del límite']:v<=55?['ok','Rango óptimo']:['warn','Muy húmedo']; }},
+    {key:'temp', cls:'temp', label:'Temperatura ambiente', unit:'°C',   dec:1, min:0, max:45,  icon:'i-thermo',
+      status:function(v){ return v<18?['warn','Fría']:v<=32?['ok','Adecuada']:['alert','Calor alto']; }},
+    {key:'air',  cls:'air',  label:'Humedad del aire',     unit:'%',    dec:0, min:0, max:100, icon:'i-waves',
+      status:function(v){ return v<50?['warn','Aire seco']:v<=85?['ok','Normal']:['warn','Muy húmedo']; }},
+    {key:'wind', cls:'wind', label:'Velocidad del viento', unit:'km/h', dec:1, min:0, max:40,  icon:'i-wind',
+      status:function(v){ return v<20?['ok','Brisa suave']:v<30?['warn','Viento moderado']:['alert','Viento fuerte']; }},
+    {key:'rain', cls:'rain', label:'Lluvia acumulada',     unit:'mm',   dec:1, min:0, max:50,  icon:'i-rain',
+      status:function(v){ return v<=0?['ok','Sin lluvia']:v<30?['ok','Con lluvia']:['warn','Lluvia fuerte']; }}
+  ];
+
+  var ALIAS = {
+    soil:['humedad_suelo','soil','suelo','soil_moisture'],
+    temp:['temperatura','temp','temperature'],
+    air:['humedad_aire','humedad','air','humidity'],
+    wind:['viento','velocidad_viento','wind'],
+    rain:['lluvia','lluvia_acumulada','rain']
+  };
+
+  function clamp(v,a,b){ return Math.min(b, Math.max(a, v)); }
+  function fmt(v,d){ return Number(v).toFixed(d); }
+
+  function cambiarLote(key){
+    loteActualKey = key;
+    var current = LOTES_DATA[key];
+    data = current.sensors;
+    history = current.history;
+
+    $('lblLoteActual').textContent = current.nombre;
+    $('infCoords').textContent = current.coords;
+    $('infArea').textContent = current.area;
+    $('infEtapa').textContent = current.etapa;
+    $('infDias').textContent = current.dias;
+
+    render();
+    renderTablaSensores();
+
+    if(window.satMap) {
+      window.satMap.flyTo([current.lat, current.lng], 14);
+    }
+    toast('Cargando información de ' + current.nombre);
+  }
+
+  function renderCards(){
+    var html = SENSORS.map(function(s){
+      var v = data[s.key];
+      var st = s.status(v);
+      var pct = clamp((v - s.min) / (s.max - s.min), 0, 1) * 100;
+      return '<article class="card '+s.cls+'">'+
+        '<div class="card-top"><span class="ico"><svg class="ico-svg" aria-hidden="true"><use href="#'+s.icon+'"/></svg></span><h3>'+s.label+'</h3></div>'+
+        '<p class="val"><span>'+fmt(v,s.dec)+'</span><span class="unit">'+s.unit+'</span></p>'+
+        '<div class="gauge" aria-hidden="true"><i style="width:'+pct.toFixed(1)+'%"></i></div>'+
+        '<span class="chip '+st[0]+'">'+st[1]+'</span>'+
+      '</article>';
+    }).join('');
+    $('cards').innerHTML = html;
+  }
+
+  function renderReco(){
+    var soil = data.soil, rain = data.rain;
+    var lead, tips = [];
+    if(soil < 35){
+      lead = 'La humedad del suelo está baja. Conviene programar riego.';
+      tips.push('Aplica riego en horas tempranas para evitar evaporación.');
+    } else if(soil > 55){
+      lead = 'El suelo está muy húmedo. Suspende el riego de este lote.';
+      tips.push('Supervisa los canales de drenaje para prevenir encharcamiento.');
+    } else {
+      lead = 'La humedad del suelo se encuentra en el rango óptimo.';
+      tips.push('Mantén la vigilancia de la humedad durante los próximos días.');
+    }
+    tips.push(rain > 0 ? 'Precipitación reciente: '+fmt(rain,1)+' mm reportados.' : 'Sin registro de lluvias recientes en la zona.');
+    $('recoLead').textContent = lead;
+    var check = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+    $('recoList').innerHTML = tips.map(function(t){ return '<li>'+check+'<span>'+t+'</span></li>'; }).join('');
+  }
+
+  function renderTablaSensores(){
+    var body = $('tablaSensoresDetalle');
+    if(!body) return;
+    var allNodes = [];
+    Object.keys(LOTES_DATA).forEach(function(k){
+      allNodes = allNodes.concat(LOTES_DATA[k].nodes);
+    });
+    body.innerHTML = allNodes.map(function(n){
+      var chipState = n.state === 'ok' 
+        ? '<span class="chip ok">En línea</span>' 
+        : '<span class="chip warn">Revisar Batería</span>';
+      return '<tr>'+
+        '<td><strong>'+n.sembradio+'</strong></td>'+
+        '<td><code>'+n.id+'</code></td>'+
+        '<td><code>'+n.topic+'</code></td>'+
+        '<td>'+n.bat+'</td>'+
+        '<td>'+n.rssi+'</td>'+
+        '<td>'+chipState+'</td>'+
+      '</tr>';
+    }).join('');
+  }
+
+  function setUpdated(d){
+    var t = $('updated');
+    if(t){
+      t.dateTime = d.toISOString();
+      t.textContent = d.toLocaleString('es-CO', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+    }
+  }
+
+  function render(){
+    renderCards();
+    renderReco();
+    drawChart();
+  }
+
+  /* ---------- Gráfica SVG ---------- */
+  var tipEl = null;
+  function dayLabels(){
+    var out = [], now = new Date();
+    for(var i=6;i>=0;i--){
+      var d = new Date(now.getFullYear(), now.getMonth(), now.getDate()-i);
+      out.push({short: DAYS[d.getDay()]+' '+d.getDate(), long: DAYS[d.getDay()]+' '+d.getDate()+'/'+(d.getMonth()+1)});
+    }
+    return out;
+  }
+
+  function drawChart(){
+    var wrap = $('chart');
+    if(!wrap) return;
+    var W = Math.max(280, Math.floor(wrap.clientWidth || 600));
+    var H = W < 520 ? 230 : 290;
+    var L = 40, R = 18, T = 22, B = 32;
+    var yMin = 30, yMax = 60, n = history.length;
+    var labels = dayLabels();
+    function X(i){ return L + i * (W - L - R) / (n - 1); }
+    function Y(v){ return T + (yMax - v) / (yMax - yMin) * (H - T - B); }
+    var s = '<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" aria-hidden="true">';
+    s += '<defs><linearGradient id="gArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" style="stop-color:var(--blue);stop-opacity:.35"/><stop offset="100%" style="stop-color:var(--blue);stop-opacity:0"/></linearGradient></defs>';
+    s += '<rect class="g-band" x="'+L+'" y="'+Y(55)+'" width="'+(W-L-R)+'" height="'+(Y(35)-Y(55))+'" rx="6"/>';
+    s += '<text class="g-band-label" x="'+(W-R-8)+'" y="'+(Y(55)+16)+'" text-anchor="end">Rango óptimo</text>';
+    [30,40,50,60].forEach(function(t){
+      s += '<line class="g-line" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(t)+'" y2="'+Y(t)+'"/>';
+      s += '<text class="g-axis" x="'+(L-8)+'" y="'+(Y(t)+4)+'" text-anchor="end">'+t+'%</text>';
+    });
+    var pts = history.map(function(v,i){ return X(i).toFixed(1)+','+Y(v).toFixed(1); });
+    s += '<path d="M'+pts.join(' L')+' L'+X(n-1).toFixed(1)+','+Y(yMin)+' L'+X(0).toFixed(1)+','+Y(yMin)+' Z" fill="url(#gArea)"/>';
+    s += '<path class="g-path" d="M'+pts.join(' L')+'"/>';
+    history.forEach(function(v,i){
+      var last = i === n-1;
+      s += '<circle class="g-dot'+(last?' last':'')+'" cx="'+X(i)+'" cy="'+Y(v)+'" r="'+(last?5.5:4)+'"/>';
+      s += '<text class="g-axis" x="'+X(i)+'" y="'+(H-10)+'" text-anchor="'+(i===0?'start':last?'end':'middle')+'">'+labels[i].short+'</text>';
+    });
+    var lv = history[n-1];
+    s += '<text class="g-val" x="'+X(n-1)+'" y="'+(Y(lv)-13)+'" text-anchor="end">'+fmt(lv,1)+'%</text>';
+    s += '<line class="g-hover" id="gHover" x1="0" x2="0" y1="'+T+'" y2="'+(H-B)+'" style="display:none"/>';
+    s += '</svg><div class="tip" id="tip" hidden></div>';
+    wrap.innerHTML = s;
+    tipEl = $('tip');
+    var hv = $('gHover');
+    function show(ev){
+      var r = wrap.getBoundingClientRect();
+      var x = ev.clientX - r.left;
+      var i = clamp(Math.round((x - L) / ((W - L - R) / (n - 1))), 0, n-1);
+      hv.setAttribute('x1', X(i)); hv.setAttribute('x2', X(i)); hv.style.display = '';
+      tipEl.hidden = false;
+      tipEl.innerHTML = labels[i].long + ' · <b>' + fmt(history[i],1) + '%</b>';
+      var tx = clamp(X(i), 60, W - 60);
+      tipEl.style.left = tx + 'px';
+      tipEl.style.top = Math.max(26, Y(history[i]) - 10) + 'px';
+    }
+    function hide(){ hv.style.display = 'none'; tipEl.hidden = true; }
+    wrap.onpointermove = show;
+    wrap.onpointerdown = show;
+    wrap.onpointerleave = hide;
+    $('chartText').textContent = 'Humedad del suelo por día: ' + history.map(function(v,i){ return labels[i].long+' '+fmt(v,1)+'%'; }).join(', ') + '.';
+  }
+
+  /* ---------- Mapas Interactivos Leaflet ---------- */
+  function initSatelliteMap(){
+    if(!$('satelliteMap')) return;
+    
+    // Coordenadas Afueras Sahagún, Córdoba
+    var map = L.map('satelliteMap', { zoomControl: false }).setView([8.9472, -75.4418], 13);
+    window.satMap = map;
+
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    // Capa Satelital Esri World Imagery (100% Gratis sin API Key)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Esri Satellite · Sahagún, Córdoba',
+      maxZoom: 18
+    }).addTo(map);
+
+    // Delimitación de Fincas en las afueras de la zona urbana de Sahagún
+    var fincas = [
+      { name: "Lote La Esperanza (Yuca M-Col)", coords: [[8.9580, -75.4510], [8.9610, -75.4450], [8.9540, -75.4420], [8.9510, -75.4490]], lat: 8.9560, lng: -75.4480 },
+      { name: "Lote El Porvenir (Yuca Taiwanesa)", coords: [[8.9640, -75.4160], [8.9660, -75.4080], [8.9580, -75.4050], [8.9570, -75.4140]], lat: 8.9612, lng: -75.4120 },
+      { name: "Lote San José (Maíz Dulce)", coords: [[8.9350, -75.4650], [8.9380, -75.4570], [8.9290, -75.4550], [8.9280, -75.4630]], lat: 8.9320, lng: -75.4610 }
+    ];
+
+    fincas.forEach(function(f){
+      var poly = L.polygon(f.coords, {
+        color: '#5cbf68',
+        fillColor: '#3a9a47',
+        fillOpacity: 0.45,
+        weight: 2
+      }).addTo(map);
+
+      poly.bindPopup("<b>" + f.name + "</b><br>Sector Rural Sahagún<br>Coordenadas: " + f.lat + ", " + f.lng);
+    });
+  }
+
+  function initRainMapOnline(){
+    if(!$('rainMapOnline')) return;
+
+    var rainMap = L.map('rainMapOnline', { zoomControl: true }).setView([8.9472, -75.4418], 9);
+    window.rainMap = rainMap;
+
+    // Mapa base OpenStreetMap Estándar (Sin necesidad de API Key)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap · RainViewer Radar API',
+      maxZoom: 18
+    }).addTo(rainMap);
+
+    // Conexión API RainViewer Weather Radar Online
+    fetch('https://api.rainviewer.com/public/weather-maps.json')
+      .then(res => res.json())
+      .then(data => {
+        if(data && data.radar && data.radar.past && data.radar.past.length > 0) {
+          var lastFrame = data.radar.past[data.radar.past.length - 1];
+          var radarTileUrl = 'https://tilecache.rainviewer.com' + lastFrame.path + '/256/{z}/{x}/{y}/2/1_1.png';
+          
+          L.tileLayer(radarTileUrl, {
+            opacity: 0.75,
+            tileSize: 256
+          }).addTo(rainMap);
+        }
+      }).catch(err => {
+        console.log("Radar RainViewer fallback:", err);
+      });
+  }
+
+  function setMode(m, text){
+    mode = m;
+    var pill = $('conn');
+    if(pill){
+      pill.className = 'pill' + (m==='live' ? ' live' : m==='error' ? ' err' : '');
+      pill.textContent = text;
+    }
+    if($('cfgState')) $('cfgState').textContent = text;
+    if($('mDisc')) $('mDisc').hidden = !(m==='live' || m==='connecting');
+  }
+
+  var toastT = null;
+  function toast(msg){
+    var t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+  }
+
+  function jitter(){
+    data.soil = clamp(Math.round((data.soil + (Math.random()-.5)*1.2)*10)/10, 20, 70);
+    data.temp = clamp(Math.round((data.temp + (Math.random()-.5)*.8)*10)/10, 15, 40);
+    data.air  = clamp(Math.round(data.air + (Math.random()-.5)*3), 40, 98);
+    data.wind = clamp(Math.round((data.wind + (Math.random()-.5)*1.6)*10)/10, 0, 30);
+    history[history.length-1] = data.soil;
+  }
+
+  /* ---------- Conexión MQTT ---------- */
+  function applyReading(obj){
+    var changed = false;
+    Object.keys(ALIAS).forEach(function(k){
+      for(var i=0;i<ALIAS[k].length;i++){
+        var raw = obj[ALIAS[k][i]];
+        if(raw !== undefined && raw !== null && isFinite(Number(raw))){
+          data[k] = Number(raw); changed = true; break;
+        }
+      }
+    });
+    if(changed){
+      history[history.length-1] = data.soil;
+      setUpdated(new Date());
+      render();
+    }
+  }
+
+  function disconnect(silent){
+    if(client){ try{ client.end(true); }catch(e){} client = null; }
+    setMode('demo', 'Datos de demostración');
+    if($('cfgUrl')) $('cfgUrl').textContent = 'Sin configurar';
+    if(!silent) toast('Desconectado. Mostrando datos de demostración.');
+  }
+
+  function connect(url, topic){
+    if(typeof mqtt === 'undefined'){
+      setMode('error', 'Sin conexión');
+      msg('No se cargó la librería MQTT.', 'err');
+      return;
+    }
+    if(client){ try{ client.end(true); }catch(e){} client = null; }
+    setMode('connecting', 'Conectando…');
+    msg('Conectando con ' + url + '…', '');
+    if($('cfgUrl')) $('cfgUrl').textContent = url;
+    if($('cfgTopic')) $('cfgTopic').textContent = topic;
+    var failTimer = setTimeout(function(){
+      if(mode === 'connecting'){ fail('No se pudo conectar. Revisa la dirección WebSocket.'); }
+    }, 9000);
+    function fail(text){
+      clearTimeout(failTimer);
+      if(client){ try{ client.end(true); }catch(e){} client = null; }
+      setMode('error', 'Sin conexión');
+      msg(text, 'err');
+    }
+    try{
+      client = mqtt.connect(url, {
+        reconnectPeriod: 0,
+        connectTimeout: 8000,
+        clientId: 'agrono_' + Math.random().toString(16).slice(2, 8)
+      });
+    }catch(e){
+      fail('La dirección no es válida: ' + e.message);
+      return;
+    }
+    client.on('connect', function(){
+      clearTimeout(failTimer);
+      client.subscribe(topic, function(err){
+        if(err){ fail('Conectó, pero no pudo suscribirse a ' + topic + '.'); return; }
+        setMode('live', 'Conectado a Mosquitto');
+        msg('Conectado. Esperando mensajes en ' + topic + '.', 'ok');
+        toast('Conectado a Mosquitto');
+        setTimeout(function(){ if(mode==='live' && $('mqttDialog').open) $('mqttDialog').close(); }, 900);
+      });
+    });
+    client.on('message', function(t, payload){
+      try{ applyReading(JSON.parse(payload.toString())); }catch(e){}
+    });
+    client.on('error', function(){ if(mode==='connecting') fail('No se pudo conectar al broker.'); });
+    client.on('close', function(){
+      if(mode==='live'){ setMode('error', 'Sin conexión'); toast('Se perdió la conexión'); }
+    });
+  }
+
+  /* ---------- Modal Dialog MQTT ---------- */
+  var dlg = $('mqttDialog');
+  function msg(text, kind){ var m = $('mMsg'); if(m){ m.textContent = text; m.className = 'm-msg' + (kind ? ' ' + kind : ''); } }
+  function openDialog(){
+    try{
+      var u = localStorage.getItem('ym_url'); var t = localStorage.getItem('ym_topic');
+      if(u && !$('wsUrl').value) $('wsUrl').value = u;
+      if(t) $('mqttTopic').value = t;
+    }catch(e){}
+    if(mode !== 'connecting') msg('', '');
+    dlg.showModal();
+    $('wsUrl').focus();
+  }
+  if($('btnConfig')) $('btnConfig').addEventListener('click', openDialog);
+  if($('btnConfig2')) $('btnConfig2').addEventListener('click', openDialog);
+  if($('mClose')) $('mClose').addEventListener('click', function(){ dlg.close(); });
+  if($('mCancel')) $('mCancel').addEventListener('click', function(){ dlg.close(); });
+  if(dlg) dlg.addEventListener('click', function(e){ if(e.target === dlg) dlg.close(); });
+  if($('mDisc')) $('mDisc').addEventListener('click', function(){ disconnect(false); msg('', ''); dlg.close(); });
+  if($('mqttForm')) $('mqttForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var url = $('wsUrl').value.trim();
+    var topic = $('mqttTopic').value.trim();
+    if(!/^wss?:\/\/.+/i.test(url)){ msg('Escribe una dirección que empiece con ws:// o wss://', 'err'); $('wsUrl').focus(); return; }
+    if(!topic){ msg('Escribe el tópico al que quieres suscribirte.', 'err'); $('mqttTopic').focus(); return; }
+    try{ localStorage.setItem('ym_url', url); localStorage.setItem('ym_topic', topic); }catch(err){}
+    connect(url, topic);
+  });
+
+  /* ---------- Selector de Lote ---------- */
+  if($('selLoteActivo')){
+    $('selLoteActivo').addEventListener('change', function(e){
+      cambiarLote(e.target.value);
+    });
+  }
+
+  if($('btnRefresh')){
+    $('btnRefresh').addEventListener('click', function(){
+      if(mode === 'live'){ toast('Conectado. Los valores cambian cuando llega un mensaje nuevo.'); return; }
+      if(mode === 'demo'){ jitter(); }
+      setUpdated(new Date());
+      render();
+      toast(mode === 'demo' ? 'Datos de demostración actualizados' : 'Sin conexión con el broker. Mostrando los últimos valores.');
+    });
+  }
+
+  // Inicializar
+  setUpdated(new Date());
+  render();
+  renderTablaSensores();
+  setTimeout(initSatelliteMap, 100);
+  setTimeout(initRainMapOnline, 300);
+})();
+</script>
+
+</body>
+</html>

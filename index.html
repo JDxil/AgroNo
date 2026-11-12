@@ -726,7 +726,7 @@
                 <input type="text" id="loteGPS" required>
               </div>
             </div>
-            <button type="submit" class="btn primary">Guardar Sembradío en Firestore</button>
+            <button type="submit" class="btn primary">Guardar Sembradío en Base de Datos</button>
             <p id="loteMsg" class="msg-box"></p>
           </form>
 
@@ -779,7 +779,7 @@
 
         <div class="panel">
           <div class="panel-head">
-            <h2>Registrar Nuevo Usuario en Firestore</h2>
+            <h2>Registrar Nuevo Usuario en Realtime Database</h2>
           </div>
           
           <form id="formUsuario">
@@ -926,7 +926,7 @@
   });
 </script>
 
-<!-- Script de Conexión de Firebase (Auth & Firestore) -->
+<!-- Script de Conexión de Firebase Realtime Database -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
@@ -937,13 +937,14 @@
     onAuthStateChanged 
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { 
-    getFirestore, 
-    doc, 
-    setDoc,
-    getDoc 
-  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    getDatabase, 
+    ref, 
+    set, 
+    get, 
+    child,
+    onValue 
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-  // Configuración oficial de tu proyecto Firebase (agrono-bb841)
   const firebaseConfig = {
     apiKey: "AIzaSyA1R1CHtT47MPZE_TnSnnDbbeoapQZfQBs",
     authDomain: "agrono-bb841.firebaseapp.com",
@@ -955,11 +956,10 @@
     measurementId: "G-FMHP0XT5QS"
   };
 
-  // Inicialización de Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   const auth = getAuth(app);
-  const db = getFirestore(app);
+  const db = getDatabase(app);
 
   const LOCAL_USERS = {
     "ruabravojuandavid02@gmail.com": { pass: "juan2007XDX", name: "Juan David Rua Bravo", role: "admin" }
@@ -996,14 +996,14 @@
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       try {
-        const userRef = doc(db, "usuarios", user.uid);
-        const userSnap = await getDoc(userRef);
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, `usuarios/${user.uid}`));
 
         let rol = "usuario";
         let nombre = user.email;
 
-        if (userSnap.exists()) {
-          const data = userSnap.data();
+        if (snapshot.exists()) {
+          const data = snapshot.val();
           rol = data.rol || "usuario";
           nombre = data.nombre || user.email;
         } else if (LOCAL_USERS[user.email]) {
@@ -1049,10 +1049,41 @@
   const usrMsg = document.getElementById('usrMsg');
   const tablaUsuariosBody = document.getElementById('tablaUsuariosBody');
 
+  // Cargar usuarios en tiempo real desde Realtime Database
+  const usuariosRef = ref(db, 'usuarios');
+  onValue(usuariosRef, (snapshot) => {
+    tablaUsuariosBody.innerHTML = `
+      <tr>
+        <td><strong>Juan David Rua Bravo</strong></td>
+        <td>ruabravojuandavid02@gmail.com</td>
+        <td><span class="side-user-role">Administrador</span></td>
+        <td><span class="chip ok">Activo</span></td>
+      </tr>
+    `;
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnap) => {
+        const u = childSnap.val();
+        if (u.email !== 'ruabravojuandavid02@gmail.com') {
+          const tr = document.createElement('tr');
+          const rolBadge = (u.rol === 'admin') 
+            ? '<span class="side-user-role">Administrador</span>' 
+            : '<span class="chip" style="background:var(--surface-2); color:var(--ink)">Usuario</span>';
+          tr.innerHTML = `
+            <td><strong>${u.nombre || 'Sin nombre'}</strong></td>
+            <td>${u.email || ''}</td>
+            <td>${rolBadge}</td>
+            <td><span class="chip ok">${u.estado || 'Activo'}</span></td>
+          `;
+          tablaUsuariosBody.appendChild(tr);
+        }
+      });
+    }
+  });
+
   if (formUsuario) {
     formUsuario.addEventListener('submit', async (e) => {
       e.preventDefault();
-      usrMsg.textContent = "Guardando en Firestore...";
+      usrMsg.textContent = "Guardando en Realtime Database...";
       usrMsg.className = "msg-box";
 
       const nombre = document.getElementById('usrNombre').value.trim();
@@ -1061,8 +1092,8 @@
       const rol = document.getElementById('usrRol').value;
 
       try {
-        const docId = email.replace(/[@.]/g, "_");
-        await setDoc(doc(db, "usuarios", docId), {
+        const cleanKey = email.replace(/[@.]/g, "_");
+        await set(ref(db, 'usuarios/' + cleanKey), {
           nombre: nombre,
           email: email,
           rol: rol,
@@ -1070,26 +1101,13 @@
           estado: "activo"
         });
 
-        usrMsg.textContent = `¡Usuario ${nombre} guardado en AgroNo!`;
+        usrMsg.textContent = `¡Usuario ${nombre} guardado correctamente!`;
         usrMsg.className = "msg-box ok";
+        formUsuario.reset();
       } catch (err) {
-        usrMsg.textContent = `Usuario ${nombre} agregado localmente.`;
-        usrMsg.className = "msg-box ok";
+        usrMsg.textContent = `Error al guardar: ${err.message}`;
+        usrMsg.className = "msg-box err";
       }
-
-      const tr = document.createElement('tr');
-      const rolBadge = (rol === 'admin') 
-        ? '<span class="side-user-role">Administrador</span>' 
-        : '<span class="chip" style="background:var(--surface-2); color:var(--ink)">Usuario</span>';
-        
-      tr.innerHTML = `
-        <td><strong>${nombre}</strong></td>
-        <td>${email}</td>
-        <td>${rolBadge}</td>
-        <td><span class="chip ok">Activo</span></td>
-      `;
-      tablaUsuariosBody.appendChild(tr);
-      formUsuario.reset();
     });
   }
 
@@ -1106,7 +1124,7 @@
       const gps = document.getElementById('loteGPS').value;
 
       try {
-        await setDoc(doc(db, "sembradios", "lote_" + Date.now()), {
+        await set(ref(db, 'sembradios/lote_' + Date.now()), {
           nombre: nombre,
           cultivo: cultivo,
           area: area,

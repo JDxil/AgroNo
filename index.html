@@ -81,7 +81,7 @@
     #splashScreen {
       position: fixed; inset: 0; background: #030804; z-index: 99999;
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
     }
     #splashScreen.fade-out { opacity: 0; visibility: hidden; }
     .splash-logo-box {
@@ -105,7 +105,7 @@
     .splash-progress {
       width: 0%; height: 100%; background: linear-gradient(90deg, #3a9a47, var(--leaf-glow));
       border-radius: 99px; box-shadow: 0 0 10px var(--leaf-glow);
-      transition: width 0.1s linear;
+      transition: width 0.15s linear;
     }
 
     @keyframes pulseLogo {
@@ -437,7 +437,7 @@
 </head>
 <body>
 
-<!-- Pantalla de Carga Inicial (Splash Screen con Barra de Progreso) -->
+<!-- Pantalla de Carga Inicial (Splash Screen con Barra de Progreso y Tiempo Visible) -->
 <div id="splashScreen">
   <div class="splash-logo-box">
     <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2zm0 3a7 7 0 0 0-7 7c0 3.866 3.134 7 7 7s7-3.134 7-7a7 7 0 0 0-7-7zm0 2.5a4.5 4.5 0 0 1 4.5 4.5c0 1.2-1 3.5-4.5 6.5-3.5-3-4.5-5.3-4.5-6.5a4.5 4.5 0 0 1 4.5-4.5z"/></svg>
@@ -904,19 +904,26 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
 <script>
-  // Control fluido de la barra de carga (Splash Screen) sincronizada con el evento load
+  // Control fluido del Splash Screen con una duración visible de 2.2 segundos para la barra de carga
   window.addEventListener('DOMContentLoaded', () => {
+    let progress = 10;
     const bar = document.getElementById('splashProgress');
     const splash = document.getElementById('splashScreen');
     
-    if(bar) bar.style.width = '60%';
+    const loadInterval = setInterval(() => {
+      progress += Math.floor(Math.random() * 10) + 5;
+      if (progress >= 92) progress = 92;
+      if (bar) bar.style.width = progress + '%';
+    }, 140);
 
     window.addEventListener('load', () => {
-      if(bar) bar.style.width = '100%';
+      clearInterval(loadInterval);
+      if (bar) bar.style.width = '100%';
+      
       setTimeout(() => {
         if(splash) splash.classList.add('fade-out');
-        document.body.classList.add('loaded'); // Revela la app suavemente al terminar de cargar
-      }, 300);
+        document.body.classList.add('loaded');
+      }, 2200);
     });
   });
 </script>

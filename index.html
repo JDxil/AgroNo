@@ -1016,8 +1016,9 @@
 
       if (snapshot.exists()) {
         const userData = snapshot.val();
-        // Compara la contraseña guardada en la base de datos
-        if (userData.contrasena === passInput) {
+        // Verifica si la propiedad contrasena o password coincide
+        const userPass = userData.contrasena || userData.password;
+        if (userPass === passInput) {
           localStorage.setItem('agrono_user', JSON.stringify({ nombre: userData.nombre, rol: userData.rol }));
           actualizarInterfaz(true, userData.nombre, userData.rol);
           loginDialog.close();
@@ -1077,7 +1078,7 @@
     }
   });
 
-  // Guardar nuevo usuario incluyendo su contraseña en Realtime Database
+  // Guardar nuevo usuario incluyendo su contraseña de manera estricta en Realtime Database
   if (formUsuario) {
     formUsuario.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1094,7 +1095,7 @@
         await set(ref(db, 'usuarios/' + cleanKey), {
           nombre: nombre,
           email: email,
-          contrasena: password, // Se incluye la contraseña para permitir el login
+          contrasena: password,
           rol: rol,
           fechaCreacion: new Date().toISOString(),
           estado: "activo"

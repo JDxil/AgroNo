@@ -212,7 +212,7 @@
     .btn.primary:hover { box-shadow: 0 6px 24px rgba(92, 191, 104, 0.6); }
     .btn.quiet { background: transparent; }
 
-    /* ---------- Tarjetas de Información (Actualizado a 5 columnas) ---------- */
+    /* ---------- Tarjetas de Información ---------- */
     .lote-info-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
     .info-box { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
     .info-box span { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -411,6 +411,17 @@
       filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
     }
 
+    /* ---------- Marca de Agua Footer ---------- */
+    .watermark-footer {
+      text-align: center;
+      padding: 16px 0 24px;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      opacity: 0.75;
+      font-family: var(--font-body);
+    }
+
     .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: #030804; border: 1px solid var(--line-bright); color: #fff; padding: 12px 20px; border-radius: 14px; font-size: 14px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5000; max-width: calc(100% - 32px); box-shadow: var(--shadow); }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
@@ -537,7 +548,7 @@
           </div>
         </header>
 
-        <!-- Métricas del Sembradío Activo (Incluyendo Día Estimado de Cosecha) -->
+        <!-- Métricas del Sembradío Activo -->
         <div class="lote-info-grid">
           <div class="info-box">
             <span>Coordenadas GPS</span>
@@ -623,7 +634,7 @@
             <p class="reco-lead" id="recoLead">La humedad del suelo se encuentra en el rango óptimo.</p>
             <ul id="recoList">
               <li><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>No se requiere riego el día de hoy para este sector.</span></li>
-              <li><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Manteniendo estas recomendaciones y el rango óptimo de humedad, se alcanzará la cosecha en la fecha estimada sin retrasos.</span></li>
+              <li><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Siguiendo las recomendaciones del sistema y manteniendo los parámetros en rango óptimo, se alcanzará la fecha estimada de cosecha sin contratiempos.</span></li>
             </ul>
           </section>
         </div>
@@ -837,6 +848,11 @@
         </div>
       </section>
 
+      <!-- Marca de agua solicitada -->
+      <footer class="watermark-footer">
+        creado por perejil
+      </footer>
+
     </div>
   </main>
 </div>
@@ -908,31 +924,35 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.10.1/mqtt.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-<!-- Script de Control del Splash Screen (Duración mínima de 5 segundos) -->
+<!-- Script de Control del Splash Screen (5 segundos y posterior apertura del Login si no hay sesión) -->
 <script>
   window.addEventListener('DOMContentLoaded', () => {
     let progress = 5;
     const bar = document.getElementById('splashProgress');
     const splash = document.getElementById('splashScreen');
     
-    // Intervalo ajustado para que alcance el 100% en aproximadamente 5 segundos
     const loadInterval = setInterval(() => {
       progress += Math.floor(Math.random() * 4) + 2;
       if (progress >= 95) progress = 95;
       if (bar) bar.style.width = progress + '%';
     }, 180);
 
-    window.addEventListener('load', () => {
+    setTimeout(() => {
+      clearInterval(loadInterval);
+      if (bar) bar.style.width = '100%';
+      
       setTimeout(() => {
-        clearInterval(loadInterval);
-        if (bar) bar.style.width = '100%';
-        
-        setTimeout(() => {
-          if(splash) splash.classList.add('fade-out');
-          document.body.classList.add('loaded');
-        }, 400);
-      }, 5000); // 5000 ms = 5 segundos mínimos garantizados
-    });
+        if(splash) splash.classList.add('fade-out');
+        document.body.classList.add('loaded');
+
+        // Mostrar el modal de login automáticamente al terminar la carga si no hay sesión activa
+        const savedUser = localStorage.getItem('agrono_user');
+        const loginDialog = document.getElementById('loginDialog');
+        if (!savedUser && loginDialog && !loginDialog.open) {
+          loginDialog.showModal();
+        }
+      }, 400);
+    }, 5000); // 5 segundos exactos de pantalla de carga inicial
   });
 </script>
 
@@ -996,7 +1016,7 @@
     });
   });
 
-  // Verificar sesión activa almacenada localmente en el navegador
+  // Verificar sesión activa almacenada localmente en el navegador al iniciar
   window.addEventListener('DOMContentLoaded', () => {
     const savedUser = localStorage.getItem('agrono_user');
     if (savedUser) {
@@ -1005,9 +1025,6 @@
       if(loginDialog.open) loginDialog.close();
     } else {
       actualizarInterfaz(false);
-      if(loginDialog && !loginDialog.open) {
-        loginDialog.showModal();
-      }
     }
   });
 
@@ -1026,7 +1043,6 @@
 
       if (snapshot.exists()) {
         const userData = snapshot.val();
-        // Verifica si la propiedad contrasena o password coincide
         const userPass = userData.contrasena || userData.password;
         if (userPass === passInput) {
           localStorage.setItem('agrono_user', JSON.stringify({ nombre: userData.nombre, rol: userData.rol }));
@@ -1037,7 +1053,6 @@
         }
       }
 
-      // Validar también con el respaldo local (LOCAL_USERS)
       if (LOCAL_USERS[emailInput] && LOCAL_USERS[emailInput].pass === passInput) {
         const local = LOCAL_USERS[emailInput];
         localStorage.setItem('agrono_user', JSON.stringify({ nombre: local.name, rol: local.role }));
@@ -1057,7 +1072,6 @@
   const usrMsg = document.getElementById('usrMsg');
   const tablaUsuariosBody = document.getElementById('tablaUsuariosBody');
 
-  // Cargar usuarios en tiempo real en la tabla de administración
   const usuariosRef = ref(db, 'usuarios');
   onValue(usuariosRef, (snapshot) => {
     tablaUsuariosBody.innerHTML = `
@@ -1088,7 +1102,6 @@
     }
   });
 
-  // Guardar nuevo usuario incluyendo su contraseña de manera estricta en Realtime Database
   if (formUsuario) {
     formUsuario.addEventListener('submit', async (e) => {
       e.preventDefault();

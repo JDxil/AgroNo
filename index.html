@@ -926,16 +926,10 @@
   });
 </script>
 
-<!-- Script de Conexión de Firebase Realtime Database -->
+<!-- Script de Conexión de Firebase Realtime Database y Validación de Credenciales -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-  import { 
-    getAuth, 
-    signInWithEmailAndPassword, 
-    signOut, 
-    onAuthStateChanged 
-  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { 
     getDatabase, 
     ref, 
@@ -958,7 +952,6 @@
 
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
-  const auth = getAuth(app);
   const db = getDatabase(app);
 
   const LOCAL_USERS = {
@@ -993,30 +986,13 @@
     });
   });
 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      try {
-        const dbRef = ref(db);
-        const snapshot = await get(child(dbRef, `usuarios/${user.uid}`));
-
-        let rol = "usuario";
-        let nombre = user.email;
-
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          rol = data.rol || "usuario";
-          nombre = data.nombre || user.email;
-        } else if (LOCAL_USERS[user.email]) {
-          rol = LOCAL_USERS[user.email].role;
-          nombre = LOCAL_USERS[user.email].name;
-        }
-
-        actualizarInterfaz(true, nombre, rol);
-        if(loginDialog.open) loginDialog.close();
-      } catch (e) {
-        actualizarInterfaz(true, user.email, "usuario");
-        if(loginDialog.open) loginDialog.close();
-      }
+  // Verificar sesión activa almacenada localmente en el navegador
+  window.addEventListener('DOMContentLoaded', () => {
+    const savedUser = localStorage.getItem('agrono_user');
+    if (savedUser) {
+      const uData = JSON.parse(savedUser);
+      actualizarInterfaz(true, uData.nombre, uData.rol);
+      if(loginDialog.open) loginDialog.close();
     } else {
       actualizarInterfaz(false);
       if(loginDialog && !loginDialog.open) {
@@ -1025,23 +1001,44 @@
     }
   });
 
+  // Lógica de inicio de sesión consultando Realtime Database y respaldo local
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    loginError.textContent = "";
+    loginError.textContent = "Verificando credenciales...";
 
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value.trim();
+    const emailInput = document.getElementById('loginEmail').value.trim();
+    const passInput = document.getElementById('loginPassword').value.trim();
+    const cleanKey = emailInput.replace(/[@.]/g, "_");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      if (LOCAL_USERS[email] && LOCAL_USERS[email].pass === password) {
-        const userLocal = LOCAL_USERS[email];
-        actualizarInterfaz(true, userLocal.name, userLocal.role);
-        loginDialog.close();
-      } else {
-        loginError.textContent = "Correo o contraseña incorrectos.";
+      const dbRef = ref(db);
+      const snapshot = await get(child(dbRef, `usuarios/${cleanKey}`));
+
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        // Compara la contraseña guardada en la base de datos
+        if (userData.contrasena === passInput) {
+          localStorage.setItem('agrono_user', JSON.stringify({ nombre: userData.nombre, rol: userData.rol }));
+          actualizarInterfaz(true, userData.nombre, userData.rol);
+          loginDialog.close();
+          loginError.textContent = "";
+          return;
+        }
       }
+
+      // Validar también con el respaldo local (LOCAL_USERS)
+      if (LOCAL_USERS[emailInput] && LOCAL_USERS[emailInput].pass === passInput) {
+        const local = LOCAL_USERS[emailInput];
+        localStorage.setItem('agrono_user', JSON.stringify({ nombre: local.name, rol: local.role }));
+        actualizarInterfaz(true, local.name, local.role);
+        loginDialog.close();
+        loginError.textContent = "";
+        return;
+      }
+
+      loginError.textContent = "Correo o contraseña incorrectos.";
+    } catch (err) {
+      loginError.textContent = "Error al conectar con la base de datos.";
     }
   });
 
@@ -1049,7 +1046,7 @@
   const usrMsg = document.getElementById('usrMsg');
   const tablaUsuariosBody = document.getElementById('tablaUsuariosBody');
 
-  // Cargar usuarios en tiempo real desde Realtime Database
+  // Cargar usuarios en tiempo real en la tabla de administración
   const usuariosRef = ref(db, 'usuarios');
   onValue(usuariosRef, (snapshot) => {
     tablaUsuariosBody.innerHTML = `
@@ -1080,6 +1077,7 @@
     }
   });
 
+  // Guardar nuevo usuario incluyendo su contraseña en Realtime Database
   if (formUsuario) {
     formUsuario.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1096,6 +1094,7 @@
         await set(ref(db, 'usuarios/' + cleanKey), {
           nombre: nombre,
           email: email,
+          contrasena: password, // Se incluye la contraseña para permitir el login
           rol: rol,
           fechaCreacion: new Date().toISOString(),
           estado: "activo"
@@ -1148,7 +1147,7 @@
   }
 
   btnLogout.addEventListener('click', () => {
-    signOut(auth).catch(() => {});
+    localStorage.removeItem('agrono_user');
     actualizarInterfaz(false);
     loginDialog.showModal();
   });

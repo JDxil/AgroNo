@@ -212,11 +212,11 @@
     .btn.primary:hover { box-shadow: 0 6px 24px rgba(92, 191, 104, 0.6); }
     .btn.quiet { background: transparent; }
 
-    /* ---------- Tarjetas de Información ---------- */
-    .lote-info-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    /* ---------- Tarjetas de Información (Actualizado a 5 columnas) ---------- */
+    .lote-info-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
     .info-box { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
-    .info-box span { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .info-box b { font-size: 16px; color: #fff; font-family: var(--font-display); }
+    .info-box span { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .info-box b { font-size: 15px; color: #fff; font-family: var(--font-display); }
 
     /* ---------- Tarjetas de Sensores (Exactamente 3) ---------- */
     .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
@@ -414,11 +414,13 @@
     .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: #030804; border: 1px solid var(--line-bright); color: #fff; padding: 12px 20px; border-radius: 14px; font-size: 14px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5000; max-width: calc(100% - 32px); box-shadow: var(--shadow); }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+    @media (max-width: 1100px) {
+      .lote-info-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
     @media (max-width: 1000px) {
       .cards { grid-template-columns: repeat(1, minmax(0, 1fr)); }
       .row { grid-template-columns: minmax(0, 1fr); }
       .cfg { grid-template-columns: minmax(0, 1fr); }
-      .lote-info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
       .app { grid-template-columns: minmax(0, 1fr); }
@@ -435,7 +437,7 @@
 </head>
 <body>
 
-<!-- Pantalla de Carga Inicial (Splash Screen con Barra de Progreso y Tiempo Visible) -->
+<!-- Pantalla de Carga Inicial (Splash Screen con duración de 5 segundos) -->
 <div id="splashScreen">
   <div class="splash-logo-box">
     <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2zm0 3a7 7 0 0 0-7 7c0 3.866 3.134 7 7 7s7-3.134 7-7a7 7 0 0 0-7-7zm0 2.5a4.5 4.5 0 0 1 4.5 4.5c0 1.2-1 3.5-4.5 6.5-3.5-3-4.5-5.3-4.5-6.5a4.5 4.5 0 0 1 4.5-4.5z"/></svg>
@@ -535,7 +537,7 @@
           </div>
         </header>
 
-        <!-- Métricas del Sembradío Activo -->
+        <!-- Métricas del Sembradío Activo (Incluyendo Día Estimado de Cosecha) -->
         <div class="lote-info-grid">
           <div class="info-box">
             <span>Coordenadas GPS</span>
@@ -552,6 +554,10 @@
           <div class="info-box">
             <span>Días desde Siembra</span>
             <b id="infDias">85 Días</b>
+          </div>
+          <div class="info-box">
+            <span>Día Estimado de Cosecha</span>
+            <b id="infCosecha">Día 135 (Óptimo)</b>
           </div>
         </div>
 
@@ -617,6 +623,7 @@
             <p class="reco-lead" id="recoLead">La humedad del suelo se encuentra en el rango óptimo.</p>
             <ul id="recoList">
               <li><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>No se requiere riego el día de hoy para este sector.</span></li>
+              <li><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Manteniendo estas recomendaciones y el rango óptimo de humedad, se alcanzará la cosecha en la fecha estimada sin retrasos.</span></li>
             </ul>
           </section>
         </div>
@@ -901,27 +908,30 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.10.1/mqtt.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-<!-- Script de Control del Splash Screen (2.2 segundos de retardo visible) -->
+<!-- Script de Control del Splash Screen (Duración mínima de 5 segundos) -->
 <script>
   window.addEventListener('DOMContentLoaded', () => {
-    let progress = 10;
+    let progress = 5;
     const bar = document.getElementById('splashProgress');
     const splash = document.getElementById('splashScreen');
     
+    // Intervalo ajustado para que alcance el 100% en aproximadamente 5 segundos
     const loadInterval = setInterval(() => {
-      progress += Math.floor(Math.random() * 10) + 5;
-      if (progress >= 92) progress = 92;
+      progress += Math.floor(Math.random() * 4) + 2;
+      if (progress >= 95) progress = 95;
       if (bar) bar.style.width = progress + '%';
-    }, 140);
+    }, 180);
 
     window.addEventListener('load', () => {
-      clearInterval(loadInterval);
-      if (bar) bar.style.width = '100%';
-      
       setTimeout(() => {
-        if(splash) splash.classList.add('fade-out');
-        document.body.classList.add('loaded');
-      }, 2200);
+        clearInterval(loadInterval);
+        if (bar) bar.style.width = '100%';
+        
+        setTimeout(() => {
+          if(splash) splash.classList.add('fade-out');
+          document.body.classList.add('loaded');
+        }, 400);
+      }, 5000); // 5000 ms = 5 segundos mínimos garantizados
     });
   });
 </script>
@@ -1185,6 +1195,7 @@
       area: "4.5 Ha · Maíz Amarillo",
       etapa: "Floración / Jiloteo (Mes 3)",
       dias: "85 Días",
+      cosecha: "Día 135 (Óptimo)",
       sensors: { soil: 42.5, temp: 28.1, air: 76 },
       history: [49.8, 47.6, 45.1, 42.3, 40.1, 38.4, 42.5],
       nodes: [
@@ -1199,6 +1210,7 @@
       area: "3.2 Ha · Yuca M-Col",
       etapa: "Engrose de Raíz (Mes 5)",
       dias: "142 Días",
+      cosecha: "Día 240 (Óptimo)",
       sensors: { soil: 34.1, temp: 30.4, air: 68 },
       history: [31.0, 32.5, 30.2, 29.8, 33.0, 35.2, 34.1],
       nodes: [
@@ -1213,6 +1225,7 @@
       area: "5.0 Ha · Ñame Espino",
       etapa: "Desarrollo de Tubería (Mes 4)",
       dias: "115 Días",
+      cosecha: "Día 210 (Óptimo)",
       sensors: { soil: 51.2, temp: 27.5, air: 82 },
       history: [55.0, 54.2, 53.1, 52.0, 51.5, 50.8, 51.2],
       nodes: [
@@ -1258,6 +1271,7 @@
     $('infArea').textContent = current.area;
     $('infEtapa').textContent = current.etapa;
     $('infDias').textContent = current.dias;
+    $('infCosecha').textContent = current.cosecha;
 
     render();
     renderTablaSensores();
@@ -1296,6 +1310,7 @@
       lead = 'La humedad del suelo se encuentra en el rango óptimo.';
       tips.push('Mantén la vigilancia de la humedad durante los próximos días.');
     }
+    tips.push('Siguiendo las recomendaciones del sistema y manteniendo los parámetros en rango óptimo, se alcanzará la fecha estimada de cosecha sin contratiempos.');
     $('recoLead').textContent = lead;
     var check = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
     $('recoList').innerHTML = tips.map(function(t){ return '<li>'+check+'<span>'+t+'</span></li>'; }).join('');
